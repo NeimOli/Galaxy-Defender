@@ -17,6 +17,32 @@ export default function TelemetryHUD({
     const triggerBomb = onTriggerBomb || (() => { if (window.game) window.game.triggerMegaBomb(); });
     return (
         <section className="hud-panel" aria-label="Flight Telemetry">
+            {/* Active Pilot Identity */}
+            <div className="hud-group" style={{ paddingBottom: '8px', borderBottom: '1px solid rgba(0, 240, 255, 0.15)' }}>
+                <span className="hud-label">Active Pilot</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
+                    <div style={{
+                        width: '28px', height: '28px', borderRadius: '50%',
+                        background: 'rgba(0, 240, 255, 0.12)', border: '1px solid #00f0ff',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        color: '#00f0ff', flexShrink: 0
+                    }}>
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+                            <circle cx="12" cy="7" r="4"/>
+                        </svg>
+                    </div>
+                    <div style={{ overflow: 'hidden' }}>
+                        <div style={{ fontWeight: 800, fontSize: '0.85rem', color: '#fff', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                            {user?.callsign || 'Guest Vanguard'}
+                        </div>
+                        <div style={{ fontSize: '0.68rem', color: '#00f0ff', fontWeight: 600 }}>
+                            {user?.rank || 'Cadet'} // {user?.shipClass || 'Interceptor'}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             {/* Quantum Shield */}
             <div className="hud-group">
                 <span className="hud-label">

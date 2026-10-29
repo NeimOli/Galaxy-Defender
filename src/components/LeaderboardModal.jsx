@@ -9,15 +9,14 @@ export default function LeaderboardModal({
     onOpenLogin,
     onOpenRegister
 }) {
-    const [tab, setTab] = useState('global'); // 'global' | 'personal'
+    const currentUser = user || API.getCurrentUser();
+    const isGuest = !currentUser || currentUser.isGuest || !currentUser.id;
+    const [tab, setTab] = useState(currentUser?.id ? 'personal' : 'global');
     const [globalScores, setGlobalScores] = useState([]);
     const [personalScores, setPersonalScores] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
     const [filterShip, setFilterShip] = useState('ALL');
-
-    const currentUser = user || API.getCurrentUser();
-    const isGuest = !currentUser || currentUser.isGuest || !currentUser.id;
 
     useEffect(() => {
         if (isOpen && !isGuest) {
@@ -377,7 +376,11 @@ export default function LeaderboardModal({
                                     </thead>
                                     <tbody>
                                         {filteredList.map((item, idx) => {
-                                            const isCurrentPilot = currentUser?.id && item.user_id === currentUser.id;
+                                            const isCurrentPilot = currentUser?.id && (
+                                                Number(item.user_id) === Number(currentUser.id) ||
+                                                (currentUser.username && item.username && item.username.toLowerCase() === currentUser.username.toLowerCase()) ||
+                                                (currentUser.callsign && item.pilot_name && item.pilot_name.toLowerCase() === currentUser.callsign.toLowerCase())
+                                            );
                                             const rankNum = idx + 1;
                                             const isTop1 = rankNum === 1 && tab === 'global';
                                             const isTop2 = rankNum === 2 && tab === 'global';

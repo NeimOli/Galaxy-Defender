@@ -154,7 +154,7 @@ export const API = {
             console.warn('[CLIENT API] User records fetch fallback:', e);
         }
         const all = await this.getLeaderboard();
-        return all.filter(s => s.user_id === userId);
+        return all.filter(s => Number(s.user_id) === Number(userId));
     },
 
     async submitScore(payload) {
@@ -163,7 +163,7 @@ export const API = {
             userId: payload.userId || currentUser.id || null,
             pilotName: payload.pilotName || currentUser.callsign || 'Guest Vanguard',
             shipClass: payload.shipClass || currentUser.shipClass || 'Interceptor',
-            score: payload.score,
+            score: Number(payload.score) || 0,
             levelReached: payload.levelReached || payload.level || 1,
             enemiesDestroyed: payload.enemiesDestroyed || 0,
             bananaSolved: payload.bananaSolved || 0,
@@ -171,11 +171,17 @@ export const API = {
         };
 
         try {
-            await fetch(`${API_BASE}/submit-score`, {
+            const res = await fetch(`${API_BASE}/submit-score`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(body)
             });
+            if (res.ok && currentUser && currentUser.id) {
+                currentUser.totalScore = (currentUser.totalScore || 0) + Number(payload.score || 0);
+                currentUser.gamesPlayed = (currentUser.gamesPlayed || 0) + 1;
+                currentUser.bananaSolved = (currentUser.bananaSolved || 0) + Number(payload.bananaSolved || 0);
+                this.setCurrentUser(currentUser);
+            }
         } catch (e) {
             console.warn('[CLIENT API] Submit score offline:', e);
         }
