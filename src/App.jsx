@@ -338,6 +338,8 @@ export default function App() {
           currentScore={hud.score}
           user={user}
           onLaunchMission={handleStartGame}
+          onOpenLogin={() => setModal('login')}
+          onOpenRegister={() => setModal('register')}
         />
       )}
 
@@ -346,6 +348,8 @@ export default function App() {
           user={user}
           onClose={() => setModal(null)}
           onLogin={() => setModal('login')}
+          onRegister={() => setModal('register')}
+          onOpenRecords={() => setModal('leaderboard')}
           onLogout={handleLogout}
         />
       )}

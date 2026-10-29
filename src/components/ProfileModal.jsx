@@ -71,7 +71,7 @@ export default function ProfileModal({
                     </div>
                 </div>
 
-                {onOpenRecords && (
+                {!user?.isGuest && user?.id && onOpenRecords && (
                     <button
                         className="btn btn-secondary"
                         style={{ width: '100%', marginBottom: '10px', borderColor: 'var(--cyan)', color: 'var(--cyan)' }}

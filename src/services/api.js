@@ -107,6 +107,11 @@ export const API = {
     },
 
     async getLeaderboard() {
+        const currentUser = this.getCurrentUser();
+        if (!currentUser || currentUser.isGuest || !currentUser.id) {
+            return [];
+        }
+
         try {
             const res = await fetch(`${API_BASE}/leaderboard`);
             if (res.ok) {
@@ -132,6 +137,11 @@ export const API = {
 
     async getUserRecords(userId) {
         if (!userId) return [];
+        const currentUser = this.getCurrentUser();
+        if (!currentUser || currentUser.isGuest || !currentUser.id) {
+            return [];
+        }
+
         try {
             const res = await fetch(`${API_BASE}/user-records/${userId}`);
             if (res.ok) {
@@ -176,7 +186,7 @@ export const API = {
         if (stored) {
             try {
                 return JSON.parse(stored);
-            } catch {}
+            } catch { }
         }
         return {
             id: null,
@@ -214,7 +224,7 @@ export const API = {
         };
         this.setCurrentUser(guest);
         document.cookie = 'galaxy_pilot_session=; path=/; max-age=0';
-        fetch(`${API_BASE}/logout`, { method: 'POST' }).catch(() => {});
+        fetch(`${API_BASE}/logout`, { method: 'POST' }).catch(() => { });
         return guest;
     }
 };
