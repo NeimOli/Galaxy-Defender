@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galaxy Defender — Space Shooter Game | Software for Enterprise</title>
+    <meta name="description" content="Galaxy Defender is an arcade space shooter demonstrating Version Control, Interoperability with Marc Conrad's Banana API, Event-Driven Architecture, and Virtual Identity.">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>">
+</head>
+<body>
+
+    <!-- -------------------------------------------------------------------
+         Top Navigation & Pilot Virtual Identity Bar
+         ------------------------------------------------------------------- -->
+    <header class="top-navbar">
+        <a href="index.html" class="brand-section">
+            <div class="brand-logo-icon">🚀</div>
+            <div>
+                <h1 class="brand-title">Galaxy Defender</h1>
+                <div class="brand-subtitle">Software for Enterprise // Defense Matrix</div>
+            </div>
+        </a>
+
+        <div class="nav-actions">
+            <!-- Pilot Virtual Identity Badge -->
+            <div id="btnProfile" class="pilot-badge-pill" title="View Pilot Dossier & Virtual Identity">
+                <div id="hudPilotAvatar" class="pilot-avatar-badge pilot_1">👨‍🚀</div>
+                <div class="pilot-info-text">
+                    <span id="hudPilotCallsign" class="pilot-callsign">Guest Vanguard</span>
+                    <span id="hudPilotRank" class="pilot-rank">Cadet</span>
+                </div>
+            </div>
+
+            <!-- Interoperability Banana Challenge Trigger -->
+            <button id="btnBananaMatrix" class="btn btn-banana" title="Solve Banana API Math Puzzle for Rewards">
+                <span>🍌</span> Banana Matrix
+            </button>
+
+            <!-- Leaderboard / Telemetry -->
+            <button id="btnLeaderboard" class="btn btn-secondary" title="View Global & Local High Scores">
+                <span>🏆</span> Records
+            </button>
+
+            <!-- Evidence of Testing Page (Assignment Deliverable) -->
+            <a href="tests.html" class="btn btn-secondary" title="View Automated Unit & Integration Tests">
+                <span>🧪</span> Tests
+            </a>
+
+            <!-- Audio Synthesizer Toggle -->
+            <button id="btnSoundToggle" class="btn btn-secondary" title="Toggle Audio Synthesizer">
+                <span id="soundIcon">🔊</span> Sound ON
+            </button>
+
+            <!-- Fullscreen / Laptop Theater Mode Toggle -->
+            <button id="btnFullscreen" class="btn btn-secondary" title="Toggle Fullscreen Immersion [F]">
+                <span id="fullscreenIcon">⛶</span> Fullscreen
+            </button>
+        </div>
+    </header>
+
+    <!-- -------------------------------------------------------------------
+         Main Game Interface & Viewport
+         ------------------------------------------------------------------- -->
+    <main class="game-wrapper">
+        <!-- HUD Telemetry Panel -->
+        <section class="hud-panel" aria-label="Flight Telemetry">
+            <div class="hud-group">
+                <span class="hud-label">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    Quantum Shield
+                </span>
+                <div class="hud-shield-container">
+                    <div id="hudShieldFill" class="hud-shield-fill"></div>
+                </div>
+            </div>
+
+            <div class="hud-group">
+                <span class="hud-label">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                    Hull Integrity / Lives
+                </span>
+                <div id="hudLivesContainer" class="hud-value">
+                    <span class="life-heart">❤️</span>
+                    <span class="life-heart">❤️</span>
+                    <span class="life-heart">❤️</span>
+                </div>
+            </div>
+
+            <div id="hudBombGroup" class="hud-group" style="cursor: pointer;" title="Tap to Detonate Mega Bomb [B]">
+                <span class="hud-label">
+                    <span>💣</span> Mega Bombs <kbd>[B]</kbd>
+                </span>
+                <div class="hud-value">
+                    <span style="color: var(--gold-primary);">⚡</span> <span id="hudBombCount">2</span>
+                </div>
+            </div>
+
+            <div class="hud-group">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <span class="hud-label">Sector</span>
+                        <div id="hudLevel" class="hud-value" style="color: var(--cyan-primary);">1</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <span class="hud-label">Combat Score</span>
+                        <div id="hudScore" class="hud-value" style="color: var(--gold-primary);">0</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Boss Health Bar (Triggered during sector climax) -->
+        <div id="bossHealthContainer" class="boss-health-container hidden">
+            <div class="boss-health-header">
+                <span id="bossHealthTitle">⚠️ DREADNOUGHT NEXUS DETECTED</span>
+                <span>BOSS THREAT: CRITICAL</span>
+            </div>
+            <div class="boss-health-bar">
+                <div id="bossHealthFill" class="boss-health-fill" style="width: 100%;"></div>
+            </div>
+        </div>
+
+        <!-- Canvas Container -->
+        <div class="canvas-container">
+            <canvas id="gameCanvas" width="800" height="700"></canvas>
+
+            <!-- Mobile Quick Touch Controls (Bomb & Pause) -->
+            <div id="mobileTouchBar" class="mobile-touch-bar">
+                <button id="btnMobileBomb" class="touch-ctrl-btn touch-bomb-btn" type="button" title="Detonate Bomb (B)">
+                    💣 <span>BOMB</span>
+                </button>
+                <button id="btnMobilePause" class="touch-ctrl-btn touch-pause-btn" type="button" title="Pause Game (P)">
+                    ⏸️ <span>PAUSE</span>
+                </button>
+            </div>
+
+            <!-- Main Menu Overlay -->
+            <div id="mainMenuOverlay" class="game-overlay">
+                <div class="overlay-card">
+                    <div style="font-size: 38px; margin-bottom: 6px;">🌌</div>
+                    <h2 class="overlay-title">GALAXY DEFENDER</h2>
+                    <p class="overlay-subtitle">
+                        High-velocity tactical space shooter demonstrating <strong>Version Control</strong>, 
+                        <strong>Banana API Interoperability</strong>, <strong>Event-Driven Systems</strong>, and 
+                        <strong>Virtual Identity</strong>.
+                    </p>
+
+                    <!-- Ergonomic Controls Cheat Sheet -->
+                    <div class="controls-card">
+                        <div class="control-item">
+                            <span>Move Ship</span>
+                            <div><kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> or <kbd>Arrows</kbd></div>
+                        </div>
+                        <div class="control-item">
+                            <span>Fire Blasters</span>
+                            <div><kbd>Spacebar</kbd> or <kbd>Click</kbd></div>
+                        </div>
+                        <div class="control-item">
+                            <span>Quantum Bomb</span>
+                            <div><kbd>B</kbd> (Clears Screen)</div>
+                        </div>
+                        <div class="control-item">
+                            <span>Pause Battle</span>
+                            <div><kbd>P</kbd> or <kbd>ESC</kbd></div>
+                        </div>
+                    </div>
+
+                    <div class="overlay-actions">
+                        <button id="btnStartGame" class="btn btn-primary" style="padding: 13px 32px; font-size: 13px;">
+                            🚀 LAUNCH MISSION
+                        </button>
+                        <a href="login.html" class="btn btn-secondary" style="padding: 13px 24px;">
+                            👤 PILOT LOGIN
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pause Overlay -->
+            <div id="pauseOverlay" class="game-overlay hidden">
+                <div class="overlay-card" style="max-width: 420px;">
+                    <div style="font-size: 32px; margin-bottom: 6px;">⏸️</div>
+                    <h2 class="overlay-title">SYSTEM PAUSED</h2>
+                    <p class="overlay-subtitle">Mission chronometer halted. Systems on standby.</p>
+                    <div class="overlay-actions" style="margin-top: 18px;">
+                        <button id="btnResume" class="btn btn-primary">▶️ RESUME FLIGHT</button>
+                        <button id="btnQuit" class="btn btn-secondary">🚪 ABORT TO MENU</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game Over Overlay -->
+            <div id="gameOverOverlay" class="game-overlay hidden">
+                <div class="overlay-card" style="max-width: 520px;">
+                    <div style="font-size: 36px; margin-bottom: 6px;">💥</div>
+                    <h2 class="overlay-title" style="color: var(--crimson-primary);">MISSION DEBRIEF</h2>
+                    <p class="overlay-subtitle">Vessel destroyed in hostile sector. Telemetry recorded.</p>
+
+                    <div class="stats-grid">
+                        <div class="stat-box">
+                            <div class="hud-label">Final Score</div>
+                            <div id="goScore" class="stat-val" style="color: var(--gold-primary);">0</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="hud-label">Sector Reached</div>
+                            <div id="goLevel" class="stat-val" style="color: var(--cyan-primary);">1</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="hud-label">Enemies Neutralized</div>
+                            <div id="goKills" class="stat-val">0</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="hud-label">Hit Accuracy</div>
+                            <div id="goAccuracy" class="stat-val">0%</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="hud-label">Banana Ciphers Solved</div>
+                            <div id="goBanana" class="stat-val" style="color: var(--gold-primary);">0</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="hud-label">Survival Time</div>
+                            <div id="goSurvival" class="stat-val">0s</div>
+                        </div>
+                    </div>
+
+                    <div class="overlay-actions">
+                        <button id="btnRestart" class="btn btn-primary">🔄 RE-DEPLOY SHIP</button>
+                        <button onclick="document.getElementById('btnLeaderboard').click()" class="btn btn-secondary">🏆 HALL OF FAME</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- -------------------------------------------------------------------
+         Modal: Banana API Decryption Matrix (Interoperability)
+         ------------------------------------------------------------------- -->
+    <div id="bananaChallengeModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="bananaModalTitle">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div id="bananaModalTitle" class="modal-title">
+                    <span>🍌</span> QUANTUM BANANA CIPHER // INTEROPERABILITY
+                </div>
+                <button class="modal-close" aria-label="Close modal">&times;</button>
+            </div>
+
+            <div class="banana-challenge-body">
+                <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 8px;">
+                    Interfacing with <strong>Dr. Marc Conrad's external Banana API</strong>. Decode the visual arithmetic cipher below to supercharge your weapons, restore shields, and earn bonus rank points!
+                </p>
+
+                <div class="banana-puzzle-wrapper">
+                    <img id="bananaPuzzleImg" class="banana-puzzle-img" alt="Marc Conrad Banana API Challenge Puzzle" src="">
+                </div>
+
+                <div id="bananaPuzzleStatus" style="font-size: 13px; font-weight: 600; margin: 10px 0;">
+                    <div class="loader-spinner"></div> Connecting to Banana API...
+                </div>
+
+                <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; font-family: var(--font-heading);">
+                    Select the single-digit cipher solution [0 - 9]:
+                </div>
+
+                <div id="bananaKeypad" class="banana-keypad">
+                    <!-- Digit buttons dynamically generated -->
+                </div>
+
+                <div id="bananaApiSourceLabel" class="banana-api-telemetry">
+                    Endpoint: https://marcconrad.com/uob/banana/api.php?out=json
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- -------------------------------------------------------------------
+         Modal: Leaderboard & Mission Records
+         ------------------------------------------------------------------- -->
+    <div id="leaderboardModal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <span>🏆</span> SECTOR HIGH ACES // HALL OF FAME
+                </div>
+                <button class="modal-close" aria-label="Close modal">&times;</button>
+            </div>
+            <div id="leaderboardList" class="leaderboard-list">
+                <div class="loader-spinner"></div> Loading telemetry records...
+            </div>
+        </div>
+    </div>
+
+    <!-- -------------------------------------------------------------------
+         Modal: Pilot Virtual Identity Profile
+         ------------------------------------------------------------------- -->
+    <div id="profileModal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+        <div class="modal-content" style="text-align: center;">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <span>🪪</span> PILOT VIRTUAL IDENTITY
+                </div>
+                <button class="modal-close" aria-label="Close modal">&times;</button>
+            </div>
+
+            <div id="profAvatar" class="pilot-avatar-large pilot_1" style="display: flex; align-items: center; justify-content: center; font-size: 32px;">👨‍🚀</div>
+            <h3 id="profCallsign" style="font-family: var(--font-heading); color: #fff; margin-bottom: 2px;">Guest Vanguard</h3>
+            <p id="profUsername" style="font-size: 12px; color: var(--cyan-primary); margin-bottom: 16px;">@guest_pilot</p>
+
+            <div class="stats-grid" style="margin: 0 auto 20px;">
+                <div class="stat-box">
+                    <div class="hud-label">Military Rank</div>
+                    <div id="profRank" class="stat-val" style="font-size: 14px;">Cadet</div>
+                </div>
+                <div class="stat-box">
+                    <div class="hud-label">Ship Class</div>
+                    <div id="profShip" class="stat-val" style="font-size: 14px;">Interceptor</div>
+                </div>
+                <div class="stat-box">
+                    <div class="hud-label">Career Score</div>
+                    <div id="profTotalScore" class="stat-val" style="font-size: 14px;">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="hud-label">Missions</div>
+                    <div id="profGames" class="stat-val" style="font-size: 14px;">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="hud-label">Banana Ciphers</div>
+                    <div id="profBanana" class="stat-val" style="font-size: 14px; color: var(--gold-primary);">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="hud-label">Security Protocol</div>
+                    <div class="stat-val" style="font-size: 12px; color: var(--emerald-primary);">VERIFIED</div>
+                </div>
+            </div>
+
+            <button id="profAuthActionBtn" class="btn btn-primary" style="width: 100%;">
+                Login / Commission Pilot
+            </button>
+        </div>
+    </div>
+
+    <!-- -------------------------------------------------------------------
+         Four Assignment Themes Showcase Footer — VIVID CARDS
+         ------------------------------------------------------------------- -->
+    <footer class="themes-showcase">
+
+        <!-- Theme 1: Version Control — Emerald -->
+        <div class="theme-card">
+            <div class="theme-badge">🌿 Theme 01</div>
+            <div class="theme-icon-wrap">🌿</div>
+            <div class="theme-title">Version Control</div>
+            <div class="theme-desc">
+                Semantic Git commits, feature branching with pull requests, and a clean GitHub repository lifecycle managed throughout development.
+            </div>
+            <div class="theme-tag-list">
+                <span class="theme-tag">git commit</span>
+                <span class="theme-tag">branching</span>
+                <span class="theme-tag">pull request</span>
+                <span class="theme-tag">GitHub</span>
+            </div>
+        </div>
+
+        <!-- Theme 2: Interoperability — Gold -->
+        <div class="theme-card">
+            <div class="theme-badge">🍌 Theme 02</div>
+            <div class="theme-icon-wrap">🍌</div>
+            <div class="theme-title">Interoperability</div>
+            <div class="theme-desc">
+                Live REST/JSON consumption of Dr. Marc Conrad's external Banana API via a PHP proxy gateway, with offline procedural fallback.
+            </div>
+            <div class="theme-tag-list">
+                <span class="theme-tag">REST API</span>
+                <span class="theme-tag">PHP proxy</span>
+                <span class="theme-tag">JSON</span>
+                <span class="theme-tag">CORS fallback</span>
+            </div>
+        </div>
+
+        <!-- Theme 3: Event-Driven — Cyan -->
+        <div class="theme-card">
+            <div class="theme-badge">⚡ Theme 03</div>
+            <div class="theme-icon-wrap">⚡</div>
+            <div class="theme-title">Event-Driven</div>
+            <div class="theme-desc">
+                Keyboard/mouse/touch input listeners, requestAnimationFrame game loop, custom DOM events for identity changes and collision dispatch.
+            </div>
+            <div class="theme-tag-list">
+                <span class="theme-tag">rAF loop</span>
+                <span class="theme-tag">CustomEvent</span>
+                <span class="theme-tag">collision</span>
+                <span class="theme-tag">WebAudio</span>
+            </div>
+        </div>
+
+        <!-- Theme 4: Virtual Identity — Purple -->
+        <div class="theme-card">
+            <div class="theme-badge">🪪 Theme 04</div>
+            <div class="theme-icon-wrap">🪪</div>
+            <div class="theme-title">Virtual Identity</div>
+            <div class="theme-desc">
+                BCrypt-hashed pilot credentials, session persistence via localStorage, callsign dossier, career rank thresholds, and avatar selection.
+            </div>
+            <div class="theme-tag-list">
+                <span class="theme-tag">BCrypt</span>
+                <span class="theme-tag">localStorage</span>
+                <span class="theme-tag">rank system</span>
+                <span class="theme-tag">session auth</span>
+            </div>
+        </div>
+
+    </footer>
+
+    <!-- Scripts in logical dependency order -->
+    <script src="js/api.js"></script>
+    <script src="js/player.js"></script>
+    <script src="js/enemies.js"></script>
+    <script src="js/game.js"></script>
+</body>
+</html>
