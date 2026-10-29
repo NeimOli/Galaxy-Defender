@@ -19,23 +19,41 @@ class SoundEngine {
     }
 
     init() {
-        if (this.initialized) return;
-        try {
-            const AudioContext = window.AudioContext || window.webkitAudioContext;
-            this.ctx = new AudioContext();
-            this.initialized = true;
-        } catch (e) {
-            console.warn('Web Audio API not supported.');
+        if (!this.ctx) {
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                this.ctx = new AudioContext();
+                this.initialized = true;
+            } catch (e) {
+                console.warn('Web Audio API not supported.');
+            }
         }
+        if (this.ctx && this.ctx.state === 'suspended') {
+            this.ctx.resume().catch(() => {});
+        }
+    }
+
+    ensureContext() {
+        if (this.isMuted) return false;
+        this.init();
+        if (!this.ctx) return false;
+        if (this.ctx.state === 'suspended') {
+            this.ctx.resume().catch(() => {});
+        }
+        return true;
     }
 
     toggleMute() {
         this.isMuted = !this.isMuted;
+        if (!this.isMuted) {
+            this.ensureContext();
+            this.playPowerUp();
+        }
         return this.isMuted;
     }
 
     playLaser(level = 1) {
-        if (this.isMuted || !this.ctx) return;
+        if (!this.ensureContext()) return;
         const now = this.ctx.currentTime;
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
@@ -55,7 +73,7 @@ class SoundEngine {
     }
 
     playExplosion(isLarge = false) {
-        if (this.isMuted || !this.ctx) return;
+        if (!this.ensureContext()) return;
         const now = this.ctx.currentTime;
         const duration = isLarge ? 0.6 : 0.25;
 
@@ -92,7 +110,7 @@ class SoundEngine {
     }
 
     playShieldHit() {
-        if (this.isMuted || !this.ctx) return;
+        if (!this.ensureContext()) return;
         const now = this.ctx.currentTime;
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
@@ -111,7 +129,7 @@ class SoundEngine {
     }
 
     playPowerUp() {
-        if (this.isMuted || !this.ctx) return;
+        if (!this.ensureContext()) return;
         const now = this.ctx.currentTime;
         const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
         notes.forEach((freq, idx) => {
@@ -131,7 +149,7 @@ class SoundEngine {
     }
 
     playBomb() {
-        if (this.isMuted || !this.ctx) return;
+        if (!this.ensureContext()) return;
         const now = this.ctx.currentTime;
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
@@ -151,7 +169,7 @@ class SoundEngine {
     }
 
     playBossShoot() {
-        if (this.isMuted || !this.ctx) return;
+        if (!this.ensureContext()) return;
         const now = this.ctx.currentTime;
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
@@ -170,7 +188,7 @@ class SoundEngine {
     }
 
     playVictory() {
-        if (this.isMuted || !this.ctx) return;
+        if (!this.ensureContext()) return;
         const chords = [523.25, 659.25, 783.99, 1046.50, 1318.51];
         chords.forEach((freq, idx) => {
             const now = this.ctx.currentTime + idx * 0.09;
@@ -529,6 +547,22 @@ class GameEngine {
                 }
             }
 
+            // Audio Mute toggle ('M')
+            if ((e.code === 'KeyM' || e.key === 'm' || e.key === 'M') && !e.ctrlKey && !e.altKey && !e.metaKey) {
+                const activeTag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
+                if (activeTag !== 'input' && activeTag !== 'textarea') {
+                    const isMuted = this.toggleSound();
+                    if (this.particles) {
+                        this.particles.addFloatingText(
+                            isMuted ? 'AUDIO MUTED' : 'AUDIO ONLINE [SYNTH ACTIVE]',
+                            this.width / 2,
+                            this.height * 0.45,
+                            isMuted ? '#ff3366' : '#00f59b'
+                        );
+                    }
+                }
+            }
+
             // Pause toggle ('P' or 'Escape')
             if (e.code === 'KeyP' || e.code === 'Escape') {
                 if (this.state === 'PLAYING') {
@@ -731,6 +765,8 @@ class GameEngine {
     toggleSound() {
         this.audio.init();
         const isMuted = this.audio.toggleMute();
+        // Notify React layer
+        window.dispatchEvent(new CustomEvent('audio_mute_changed', { detail: { isMuted } }));
         const btn = document.getElementById('btnSoundToggle');
         if (btn) {
             const soundOnSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07"/></svg>';

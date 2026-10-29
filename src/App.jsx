@@ -90,7 +90,20 @@ export default function App() {
 
   // ── Sound toggle ──────────────────────────────────────────────────────────
   const handleSoundToggle = () => {
-    setSoundMuted(m => !m);
+    setSoundMuted(prev => {
+      const next = !prev;
+      if (window.game && window.game.audio) {
+        window.game.audio.init();
+        window.game.audio.isMuted = next;
+        if (!next) {
+          window.game.audio.playPowerUp();
+          window.game.particles?.addFloatingText('AUDIO ONLINE [SYNTH ACTIVE]', window.game.width / 2, window.game.height * 0.45, '#00f59b');
+        } else {
+          window.game.particles?.addFloatingText('AUDIO MUTED', window.game.width / 2, window.game.height * 0.45, '#ff3366');
+        }
+      }
+      return next;
+    });
   };
 
   // ── Banana Challenge reward injection ────────────────────────────────────
@@ -142,25 +155,38 @@ export default function App() {
     const sync = () => setUser(API.getCurrentUser());
     const openBanana = () => setModal('banana');
 
+    const syncAudio = (e) => {
+      if (e.detail && typeof e.detail.isMuted === 'boolean') {
+        setSoundMuted(e.detail.isMuted);
+      }
+    };
+
     const handleGlobalKey = (e) => {
-      // Trigger mega bomb on 'B' if not inside an input
+      const tag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
+      if (tag === 'input' || tag === 'textarea') return;
+
+      // Trigger mega bomb on 'B'
       if (e.code === 'KeyB' || e.key === 'b' || e.key === 'B') {
-        const tag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
-        if (tag !== 'input' && tag !== 'textarea') {
-          if (window.game) {
-            window.game.triggerMegaBomb();
-          }
+        if (window.game) {
+          window.game.triggerMegaBomb();
         }
+      }
+
+      // Audio Mute toggle shortcut on 'M'
+      if ((e.code === 'KeyM' || e.key === 'm' || e.key === 'M') && !e.ctrlKey && !e.altKey && !e.metaKey) {
+        handleSoundToggle();
       }
     };
 
     window.addEventListener('virtual_identity_changed', sync);
     window.addEventListener('open_banana_challenge', openBanana);
+    window.addEventListener('audio_mute_changed', syncAudio);
     window.addEventListener('keydown', handleGlobalKey);
 
     return () => {
       window.removeEventListener('virtual_identity_changed', sync);
       window.removeEventListener('open_banana_challenge', openBanana);
+      window.removeEventListener('audio_mute_changed', syncAudio);
       window.removeEventListener('keydown', handleGlobalKey);
     };
   }, []);

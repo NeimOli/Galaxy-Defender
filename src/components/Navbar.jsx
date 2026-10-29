@@ -104,24 +104,28 @@ export default function Navbar({
                 <button
                     className={`btn btn-secondary ${soundMuted ? 'muted' : ''}`}
                     onClick={handleToggleSound}
-                    title="Toggle Synthesized Audio"
+                    title="Toggle Synthesized Audio [M]"
+                    style={{
+                        borderColor: soundMuted ? 'rgba(255, 51, 102, 0.45)' : 'rgba(0, 245, 155, 0.45)',
+                        background: soundMuted ? 'rgba(255, 51, 102, 0.08)' : 'rgba(0, 245, 155, 0.08)'
+                    }}
                 >
                     {soundMuted ? (
                         <>
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ff3366" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                                 <path d="M11 5L6 9H2v6h4l5 4V5z"/>
                                 <line x1="23" y1="9" x2="17" y2="15"/>
                                 <line x1="17" y1="9" x2="23" y2="15"/>
                             </svg>
-                            <span>Audio Muted</span>
+                            <span style={{ color: '#ff3366', fontWeight: 800 }}>Audio MUTED</span>
                         </>
                     ) : (
                         <>
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00f59b" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                                 <path d="M11 5L6 9H2v6h4l5 4V5z"/>
                                 <path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07"/>
                             </svg>
-                            <span>Audio ON</span>
+                            <span style={{ color: '#00f59b', fontWeight: 800 }}>Audio ON</span>
                         </>
                     )}
                 </button>
