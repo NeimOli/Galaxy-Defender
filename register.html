@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pilot Registration | Galaxy Defender</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>">
+</head>
+<body>
+
+    <header class="top-navbar" style="max-width: 480px; width: 95%; margin: 16px auto 0;">
+        <a href="index.html" class="brand-section">
+            <div class="brand-logo-icon">🚀</div>
+            <div>
+                <div class="brand-title" style="font-size: 16px;">Galaxy Defender</div>
+                <div class="brand-subtitle">Commission New Pilot</div>
+            </div>
+        </a>
+        <a href="index.html" class="btn btn-secondary" style="padding: 6px 14px; font-size: 10px;">
+            ← Return to Game
+        </a>
+    </header>
+
+    <main class="auth-container" style="max-width: 480px; width: 95%; margin: 20px auto;">
+        <div class="auth-header">
+            <div style="font-size: 32px; margin-bottom: 6px;">🎖️</div>
+            <h1 class="auth-title">PILOT COMMISSION</h1>
+            <p style="font-size: 12px; color: var(--text-secondary);">
+                Register your virtual identity to establish military flight credentials and career ranking.
+            </p>
+        </div>
+
+        <form id="registerForm" class="auth-form">
+            <div class="form-group">
+                <label class="form-label" for="username">Username / ID Code</label>
+                <input type="text" id="username" class="form-input" placeholder="e.g. nova_pilot" required autocomplete="username">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="callsign">Display Callsign</label>
+                <input type="text" id="callsign" class="form-input" placeholder="e.g. Ghost Valkyrie" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Select Pilot Avatar</label>
+                <div class="avatar-selector">
+                    <div class="avatar-option pilot_1 selected" data-avatar="pilot_1" title="Vanguard Blue">👨‍🚀</div>
+                    <div class="avatar-option pilot_2" data-avatar="pilot_2" title="Crimson Valkyrie">👩‍🚀</div>
+                    <div class="avatar-option pilot_3" data-avatar="pilot_3" title="Solar Falcon">🦅</div>
+                    <div class="avatar-option pilot_4" data-avatar="pilot_4" title="Cyber Phantom">🤖</div>
+                </div>
+                <input type="hidden" id="selectedAvatar" value="pilot_1">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="shipClass">Fighter Specialization</label>
+                <select id="shipClass" class="form-input" style="background: var(--bg-surface); cursor: pointer;">
+                    <option value="Interceptor">Interceptor (High Agility & Acceleration)</option>
+                    <option value="Dreadnought">Dreadnought (Reinforced Hull & Shielding)</option>
+                    <option value="Phantom Recon">Phantom Recon (Precision Plasma Lasers)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="password">Security Passcode</label>
+                <input type="password" id="password" class="form-input" placeholder="Min. 6 characters" required minlength="6" autocomplete="new-password">
+            </div>
+
+            <button type="submit" id="btnSubmitRegister" class="btn btn-primary" style="width: 100%; padding: 13px; font-size: 12px; margin-top: 6px;">
+                🎖️ COMMISSION PILOT
+            </button>
+
+            <div id="authStatusMsg" class="auth-status-msg"></div>
+
+            <div style="margin-top: 18px; text-align: center; font-size: 12px; color: var(--text-secondary);">
+                Already commissioned? 
+                <a href="login.html" style="color: var(--cyan-primary); text-decoration: none; font-weight: 600;">Log In to Hangar →</a>
+            </div>
+        </form>
+    </main>
+
+    <script src="js/api.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Avatar picker interactive selection
+            const avatarOpts = document.querySelectorAll('.avatar-option');
+            const hiddenAvatarInput = document.getElementById('selectedAvatar');
+
+            avatarOpts.forEach(opt => {
+                opt.addEventListener('click', () => {
+                    avatarOpts.forEach(o => o.classList.remove('selected'));
+                    opt.classList.add('selected');
+                    hiddenAvatarInput.value = opt.getAttribute('data-avatar');
+                });
+            });
+
+            document.getElementById('registerForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const btn = document.getElementById('btnSubmitRegister');
+                const statusMsg = document.getElementById('authStatusMsg');
+
+                const username = document.getElementById('username').value.trim();
+                const callsign = document.getElementById('callsign').value.trim();
+                const password = document.getElementById('password').value;
+                const avatar = hiddenAvatarInput.value;
+                const shipClass = document.getElementById('shipClass').value;
+
+                btn.disabled = true;
+                btn.innerHTML = '<div class="loader-spinner"></div> Commissioning Flight Record...';
+                statusMsg.textContent = '';
+
+                const result = await API.register({
+                    username,
+                    password,
+                    callsign,
+                    avatar,
+                    ship_class: shipClass
+                });
+
+                if (result.success) {
+                    statusMsg.style.color = 'var(--emerald-primary)';
+                    statusMsg.textContent = `Commission confirmed for ${callsign}! Logging in...`;
+                    await API.login(username, password);
+                    setTimeout(() => window.location.href = 'index.html', 1000);
+                } else {
+                    statusMsg.style.color = 'var(--crimson-primary)';
+                    statusMsg.textContent = result.message || 'Commission failed. Callsign may be in use.';
+                    btn.disabled = false;
+                    btn.innerHTML = '🎖️ COMMISSION PILOT';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
