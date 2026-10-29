@@ -40,7 +40,20 @@ export default function App() {
   const [modal, setModal] = useState(null); // 'banana' | 'leaderboard' | 'profile' | 'login' | 'register' | 'tests'
 
   // ── Callbacks from game engine ────────────────────────────────────────────
+  const lastHudRef = useRef({});
   const handleHudUpdate = useCallback((hudData) => {
+    const last = lastHudRef.current;
+    if (
+      Math.round(last.shield) === Math.round(hudData.shield) &&
+      last.maxShield === hudData.maxShield &&
+      last.lives === hudData.lives &&
+      last.bombs === hudData.bombs &&
+      last.score === hudData.score &&
+      last.level === hudData.level
+    ) {
+      return;
+    }
+    lastHudRef.current = hudData;
     setHud(prev => ({ ...prev, ...hudData }));
   }, []);
 

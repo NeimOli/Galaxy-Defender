@@ -523,7 +523,7 @@ class GameEngine {
             }
 
             // Mega Bomb trigger ('B')
-            if (e.code === 'KeyB') {
+            if (e.code === 'KeyB' || e.key === 'b' || e.key === 'B') {
                 if (this.state === 'PLAYING') {
                     this.triggerMegaBomb();
                 }
@@ -742,24 +742,41 @@ class GameEngine {
     }
 
     triggerMegaBomb() {
+        if (!this.player) return;
+
+        // Only allow detonating while mission is actively playing
+        if (this.state !== 'PLAYING') {
+            return;
+        }
+
+        if (this.player.megaBombs <= 0) {
+            this.particles.addFloatingText('NO MEGA BOMBS! SOLVE BANANA CIPHER TO RESTOCK', this.width / 2, this.height * 0.4, '#ff3366');
+            if (this.audio) this.audio.playShieldHit();
+            return;
+        }
+
         if (this.player.triggerMegaBomb(this.audio)) {
-            this.screenShake = 25;
-            this.particles.addExplosion(this.width / 2, this.height / 2, '#ffaa00', 80, 8);
+            this.screenShake = 30;
+            this.particles.addExplosion(this.width / 2, this.height / 2, '#ffaa00', 90, 8);
+            this.particles.addExplosion(this.width / 2, this.height / 2, '#00f0ff', 60, 6);
             this.particles.addFloatingText('QUANTUM BANANA BOMB DETONATED!', this.width / 2, this.height * 0.4, '#ffcc00');
 
             // Obliterate all normal enemies and enemy bullets
             for (const enemy of this.enemies) {
-                this.score += enemy.points;
+                const pts = Number(enemy.points) || 100;
+                this.score += pts;
                 this.enemiesDestroyed++;
-                this.particles.addExplosion(enemy.x + enemy.width / 2, enemy.y + enemy.height / 2, '#ff0055', 25);
+                const ex = enemy.x + (enemy.width || 32) / 2;
+                const ey = enemy.y + (enemy.height || 32) / 2;
+                this.particles.addExplosion(ex, ey, '#ff0055', 25);
             }
             this.enemies = [];
             this.enemyBullets = [];
 
             // Damage boss if present
             if (this.boss) {
-                this.boss.takeDamage(250);
-                this.particles.addExplosion(this.boss.x + this.boss.width / 2, this.boss.y + this.boss.height / 2, '#ffcc00', 40);
+                this.boss.takeDamage(300);
+                this.particles.addExplosion(this.boss.x + this.boss.width / 2, this.boss.y + this.boss.height / 2, '#ffcc00', 45);
             }
 
             this.updateHUD();

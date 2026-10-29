@@ -45,17 +45,39 @@ export default function TelemetryHUD({
 
             {/* Quantum Shield */}
             <div className="hud-group">
-                <span className="hud-label">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                    </svg>
-                    Quantum Shield
-                </span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                    <span className="hud-label" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        </svg>
+                        Quantum Shield
+                    </span>
+                    <span style={{
+                        fontSize: '0.8rem',
+                        fontFamily: "'Orbitron', monospace",
+                        fontWeight: 800,
+                        color: shieldPct < 25 ? '#ff3366' : (shieldPct < 60 ? '#ffb703' : '#00f0ff')
+                    }}>
+                        {Math.round(shieldPct)}%
+                    </span>
+                </div>
                 <div className="hud-shield-container">
                     <div
                         className={`hud-shield-fill ${shieldPct < 25 ? 'critical' : ''}`}
-                        style={{ width: `${Math.max(0, Math.min(100, shieldPct))}%` }}
+                        style={{
+                            width: `${Math.max(0, Math.min(100, shieldPct))}%`,
+                            background: shieldPct < 25
+                                ? 'linear-gradient(90deg, #ff3366, #ff0055)'
+                                : (shieldPct < 60
+                                    ? 'linear-gradient(90deg, #ffb703, #ff8c00)'
+                                    : 'linear-gradient(90deg, #00f0ff, #0077ff)'),
+                            boxShadow: shieldPct > 0 ? '0 0 8px rgba(0, 240, 255, 0.45)' : 'none'
+                        }}
                     />
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '3px', fontSize: '0.62rem', color: 'rgba(255,255,255,0.38)' }}>
+                    <span>{shieldPct > 0 ? 'FORCEFIELD ONLINE' : 'SHIELD COLLAPSED'}</span>
+                    <span>AUTO-REGEN 3s</span>
                 </div>
             </div>
 
@@ -83,25 +105,56 @@ export default function TelemetryHUD({
             {/* Mega Bombs */}
             <div
                 className="hud-group"
-                style={{ cursor: 'pointer' }}
+                style={{
+                    cursor: bombCount > 0 ? 'pointer' : 'default',
+                    border: bombCount > 0 ? '1px solid rgba(255, 183, 3, 0.35)' : '1px solid rgba(255, 255, 255, 0.08)',
+                    background: bombCount > 0 ? 'rgba(255, 183, 3, 0.05)' : 'transparent',
+                    borderRadius: '6px',
+                    padding: '8px 10px',
+                    transition: 'all 0.15s ease'
+                }}
                 onClick={triggerBomb}
-                title="Tap to Detonate Mega Bomb [B]"
+                title="Click or press [B] to Detonate Quantum Mega Bomb"
             >
-                <span className="hud-label">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <circle cx="12" cy="12" r="9"/>
-                        <line x1="12" y1="3" x2="12" y2="7"/>
-                        <line x1="12" y1="17" x2="12" y2="21"/>
-                        <line x1="3" y1="12" x2="7" y2="12"/>
-                        <line x1="17" y1="12" x2="21" y2="12"/>
-                    </svg>
-                    Mega Bombs <kbd>[B]</kbd>
-                </span>
-                <div className="hud-value">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="var(--gold-primary)">
-                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-                    </svg>
-                    <span>{bombCount}</span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span className="hud-label" style={{ display: 'flex', alignItems: 'center', gap: '4px', color: bombCount > 0 ? '#ffb703' : 'rgba(255,255,255,0.4)', margin: 0 }}>
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <circle cx="12" cy="12" r="9"/>
+                            <line x1="12" y1="3" x2="12" y2="7"/>
+                            <line x1="12" y1="17" x2="12" y2="21"/>
+                            <line x1="3" y1="12" x2="7" y2="12"/>
+                            <line x1="17" y1="12" x2="21" y2="12"/>
+                        </svg>
+                        Mega Bombs <kbd style={{ background: 'rgba(255,183,3,0.18)', color: '#ffb703', padding: '1px 5px', borderRadius: '3px', fontSize: '0.65rem' }}>[B]</kbd>
+                    </span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <span style={{
+                            fontFamily: "'Orbitron', monospace",
+                            fontSize: '1rem',
+                            fontWeight: 800,
+                            color: bombCount > 0 ? '#ffb703' : '#ff3366'
+                        }}>
+                            {bombCount}
+                        </span>
+                        {bombCount > 0 ? (
+                            <span style={{
+                                fontSize: '0.62rem',
+                                fontWeight: 800,
+                                background: 'linear-gradient(135deg, #ffb703, #ff8c00)',
+                                color: '#050814',
+                                padding: '2px 7px',
+                                borderRadius: '4px',
+                                letterSpacing: '0.04em'
+                            }}>
+                                DETONATE
+                            </span>
+                        ) : (
+                            <span style={{ fontSize: '0.62rem', color: '#ff3366', fontWeight: 600 }}>EMPTY</span>
+                        )}
+                    </div>
+                </div>
+                <div style={{ fontSize: '0.62rem', color: 'rgba(255,255,255,0.38)', marginTop: '4px' }}>
+                    {bombCount > 0 ? 'Click to wipe all enemies & bullets' : 'Solve Banana API to restock'}
                 </div>
             </div>
 
