@@ -34,6 +34,14 @@ export default function App() {
     level: 1,
   });
   const [bossHealth, setBossHealth] = useState(null); // null | { hp, maxHp, name }
+  const [gameOverStats, setGameOverStats] = useState({
+    score: 0,
+    level: 1,
+    enemiesDestroyed: 0,
+    bananaSolved: 0,
+    accuracy: 0,
+    survivalSecs: 0,
+  });
 
   // ── UI Controls ───────────────────────────────────────────────────────────
   const [soundMuted, setSoundMuted] = useState(false);
@@ -61,8 +69,11 @@ export default function App() {
     setBossHealth(bh);
   }, []);
 
-  const handleStateChange = useCallback((newState) => {
+  const handleStateChange = useCallback((newState, stats) => {
     setGameState(newState);
+    if (newState === 'GAME_OVER' && stats) {
+      setGameOverStats(stats);
+    }
   }, []);
 
   // ── Auth handlers ─────────────────────────────────────────────────────────
@@ -176,6 +187,13 @@ export default function App() {
       }
     };
 
+    const handleGalaxyGameOver = (e) => {
+      if (e.detail) {
+        setGameOverStats(e.detail);
+        setGameState('GAME_OVER');
+      }
+    };
+
     const handleGlobalKey = (e) => {
       const tag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
       if (tag === 'input' || tag === 'textarea') return;
@@ -197,6 +215,7 @@ export default function App() {
     window.addEventListener('open_banana_challenge', openBanana);
     window.addEventListener('audio_mute_changed', syncAudio);
     window.addEventListener('galaxy_hud_update', handleGalaxyHud);
+    window.addEventListener('galaxy_game_over', handleGalaxyGameOver);
     window.addEventListener('keydown', handleGlobalKey);
 
     return () => {
@@ -204,6 +223,7 @@ export default function App() {
       window.removeEventListener('open_banana_challenge', openBanana);
       window.removeEventListener('audio_mute_changed', syncAudio);
       window.removeEventListener('galaxy_hud_update', handleGalaxyHud);
+      window.removeEventListener('galaxy_game_over', handleGalaxyGameOver);
       window.removeEventListener('keydown', handleGlobalKey);
     };
   }, [handleHudUpdate]);
@@ -351,16 +371,44 @@ export default function App() {
             <div className="game-overlay gameover-overlay" id="gameOverOverlay">
               <div className="overlay-icon-sm">
                 <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="#ff3366" strokeWidth="2">
-                  <circle cx="12" cy="12" r="10"/>
-                  <line x1="15" y1="9" x2="9" y2="15"/>
-                  <line x1="9" y1="9" x2="15" y2="15"/>
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                  <line x1="8" y1="9" x2="16" y2="15"/>
+                  <line x1="16" y1="9" x2="8" y2="15"/>
                 </svg>
               </div>
-              <h2 className="overlay-title" style={{ color: '#ff3366', fontSize: '2rem' }}>HULL INTEGRITY ZERO</h2>
-              <p className="overlay-sub" style={{ color: 'rgba(255, 51, 102, 0.85)' }}>Spacecraft Destroyed // Sector Lost</p>
-              <div className="overlay-score-final">
-                Mission Combat Score: <strong>{hud.score.toLocaleString()}</strong>
+              <h2 className="overlay-title" style={{ color: '#ff3366', fontSize: '2rem' }}>QUANTUM SHIELD DEPLETED</h2>
+              <p className="overlay-sub" style={{ color: 'rgba(255, 51, 102, 0.85)' }}>Deflector Forcefield at 0% // Mission Terminated</p>
+
+              {/* Status Debrief Grid: Combat Points & Banana Ciphers Solved */}
+              <div className="overlay-stats-grid">
+                <div className="overlay-stat-card">
+                  <span className="overlay-stat-label">Combat Points</span>
+                  <span className="overlay-stat-val">{(gameOverStats.score || hud.score).toLocaleString()}</span>
+                </div>
+                <div className="overlay-stat-card banana-card">
+                  <span className="overlay-stat-label">Banana Ciphers</span>
+                  <span className="overlay-stat-val banana-val">
+                    {gameOverStats.bananaSolved ?? window.game?.bananaSolved ?? 0} SOLVED
+                  </span>
+                </div>
+                <div className="overlay-stat-card">
+                  <span className="overlay-stat-label">Sector</span>
+                  <span className="overlay-stat-val">Sector {gameOverStats.level || hud.level}</span>
+                </div>
+                <div className="overlay-stat-card">
+                  <span className="overlay-stat-label">Hostiles Down</span>
+                  <span className="overlay-stat-val">{gameOverStats.enemiesDestroyed ?? 0}</span>
+                </div>
+                <div className="overlay-stat-card">
+                  <span className="overlay-stat-label">Accuracy</span>
+                  <span className="overlay-stat-val">{gameOverStats.accuracy ?? 0}%</span>
+                </div>
+                <div className="overlay-stat-card">
+                  <span className="overlay-stat-label">Survival Time</span>
+                  <span className="overlay-stat-val">{gameOverStats.survivalSecs ?? 0}s</span>
+                </div>
               </div>
+
               <div className="overlay-btn-group">
                 <button className="btn-launch" onClick={handleStartGame}>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">

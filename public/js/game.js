@@ -1073,7 +1073,7 @@ class GameEngine {
                 this.particles.addExplosion(eb.x, eb.y, '#ff0055', 12);
                 this.player.takeDamage(20, this.audio, this.particles);
                 this.updateHUD();
-                if (this.player.lives <= 0) {
+                if (this.player.shield <= 0 || this.player.lives <= 0) {
                     this.handleGameOver();
                     return;
                 }
@@ -1095,7 +1095,7 @@ class GameEngine {
                 this.particles.addExplosion(e.x + e.width / 2, e.y + e.height / 2, '#ff3300', 25);
                 this.player.takeDamage(35, this.audio, this.particles);
                 this.updateHUD();
-                if (this.player.lives <= 0) {
+                if (this.player.shield <= 0 || this.player.lives <= 0) {
                     this.handleGameOver();
                     return;
                 }
@@ -1229,7 +1229,21 @@ class GameEngine {
         const goOverlay = document.getElementById('gameOverOverlay');
         if (goOverlay) goOverlay.classList.remove('hidden');
 
-        if (this.onStateChange) this.onStateChange('GAME_OVER');
+        const debriefStats = {
+            score: this.score,
+            level: this.level,
+            enemiesDestroyed: this.enemiesDestroyed,
+            bananaSolved: this.bananaSolved,
+            accuracy: parseFloat(accuracy),
+            survivalSecs: survivalSecs
+        };
+
+        // Dispatch global CustomEvent for real-time React Debrief
+        try {
+            window.dispatchEvent(new CustomEvent('galaxy_game_over', { detail: debriefStats }));
+        } catch (e) {}
+
+        if (this.onStateChange) this.onStateChange('GAME_OVER', debriefStats);
 
         // Transmit mission debrief via API (SQLite or LocalStorage telemetry)
         if (window.API && typeof window.API.submitScore === 'function') {

@@ -30,6 +30,11 @@ export default function GameCanvas({
       }
     };
 
+    // State transition callback with debrief telemetry
+    engine.onStateChange = function (state, stats) {
+      onStateChange(state, stats);
+    };
+
     // Override banana challenge to open React modal
     engine.triggerBananaChallenge = function () {
       engine.state = 'BANANA_CHALLENGE';

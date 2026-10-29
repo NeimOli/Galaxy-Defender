@@ -228,31 +228,21 @@ class Player {
 
             if (this.shield <= 0) {
                 this.shield = 0;
+                this.lives = 0; // Shield reaches 0 -> Immediate Game Over
                 if (particles) {
-                    particles.addFloatingText('SHIELD COLLAPSED! HULL AT RISK!', centerX, topY, '#ff3366');
+                    particles.addFloatingText('CRITICAL: QUANTUM SHIELD 0%! MISSION TERMINATED!', centerX, topY, '#ff0033');
                 }
+                if (audioSynth) audioSynth.playPlayerExplosion();
             } else {
                 if (particles) {
                     const color = this.shield < 30 ? '#ff8c00' : '#ffd700';
                     particles.addFloatingText(`SHIELD DEFLECTED -${absorbed} [${Math.round(this.shield)}%]`, centerX, topY, color);
                 }
+                if (audioSynth) audioSynth.playShieldHit();
             }
-            if (audioSynth) audioSynth.playShieldHit();
         } else {
-            // Shield was already 0 — direct Hull breach!
-            this.lives--;
-            this.shield = 40; // Emergency reserve reboot
-            this.isInvulnerable = true;
-            this.invulnerableTimer = 110; // ~1.8 seconds invulnerability
-
-            if (particles) {
-                particles.addFloatingText(
-                    `HULL BREACH! -1 LIFE (${Math.max(0, this.lives)} REMAINING)`,
-                    centerX,
-                    topY,
-                    '#ff0055'
-                );
-            }
+            this.shield = 0;
+            this.lives = 0;
             if (audioSynth) audioSynth.playPlayerExplosion();
         }
 
