@@ -461,21 +461,28 @@ class GameEngine {
     // -------------------------------------------------------------------------
     initEventListeners() {
         // Fullscreen toggle helper for laptop / desktop immersion
+        const expandSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 00-2 2v3m18 0V5a2 2 0 00-2-2h-3m0 18h3a2 2 0 002-2v-3M3 16v3a2 2 0 002 2h3"/></svg>';
+        const shrinkSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14h6m0 0v6m0-6L3 21m17-7h-6m0 0v6m0-6l7 7M4 10h6m0 0V4m0 6L3 3m17 7h-6m0 0V4m0 6l7-7"/></svg>';
+
+        const updateFullscreenUI = () => {
+            const btnFs = document.getElementById('btnFullscreen');
+            if (btnFs) {
+                btnFs.innerHTML = document.fullscreenElement ? `${shrinkSvg} <span>Windowed</span>` : `${expandSvg} <span>Fullscreen</span>`;
+            }
+        };
+
         const toggleFullscreen = () => {
             const gameWrapper = document.querySelector('.game-wrapper');
-            const fsIcon = document.getElementById('fullscreenIcon');
             if (!document.fullscreenElement) {
                 if (gameWrapper && gameWrapper.requestFullscreen) {
                     gameWrapper.requestFullscreen().catch(() => {});
                 } else if (gameWrapper && gameWrapper.webkitRequestFullscreen) {
                     gameWrapper.webkitRequestFullscreen();
                 }
-                if (fsIcon) fsIcon.textContent = '✕';
             } else {
                 if (document.exitFullscreen) {
                     document.exitFullscreen().catch(() => {});
                 }
-                if (fsIcon) fsIcon.textContent = '⛶';
             }
         };
 
@@ -484,12 +491,7 @@ class GameEngine {
             btnFullscreen.addEventListener('click', toggleFullscreen);
         }
 
-        document.addEventListener('fullscreenchange', () => {
-            const fsIcon = document.getElementById('fullscreenIcon');
-            if (fsIcon) {
-                fsIcon.textContent = document.fullscreenElement ? '✕' : '⛶';
-            }
-        });
+        document.addEventListener('fullscreenchange', updateFullscreenUI);
 
         // Keyboard Handlers
         window.addEventListener('keydown', (e) => {
@@ -715,7 +717,9 @@ class GameEngine {
         this.audio.init();
         const isMuted = this.audio.toggleMute();
         const btn = document.getElementById('btnSoundToggle');
-        btn.innerHTML = isMuted ? '🔇 Muted' : '🔊 Sound ON';
+        const soundOnSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07"/></svg>';
+        const soundMutedSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4V5z"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>';
+        btn.innerHTML = isMuted ? `${soundMutedSvg} <span>Audio Muted</span>` : `${soundOnSvg} <span>Audio ON</span>`;
         btn.classList.toggle('muted', isMuted);
     }
 
@@ -1142,14 +1146,15 @@ class GameEngine {
             shieldBar.style.width = `${shieldPct}%`;
         }
 
-        // Lives Icons
+        // Lives Icons (Precision Glowing Hull SVG)
         const livesEl = document.getElementById('hudLivesContainer');
         if (livesEl) {
             let hearts = '';
+            const hullSvg = '<svg class="life-heart" width="16" height="16" viewBox="0 0 24 24" fill="#00f59b"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>';
             for (let i = 0; i < this.player.lives; i++) {
-                hearts += '<span class="life-heart">❤️</span>';
+                hearts += hullSvg;
             }
-            livesEl.innerHTML = hearts || '<span style="color: #ff0055;">CRITICAL</span>';
+            livesEl.innerHTML = hearts || '<span style="color: #ff3366; font-size: 11px; font-weight: 800;">CRITICAL HULL</span>';
         }
 
         // Bombs

@@ -1,7 +1,6 @@
 /* ====================================================================
-   Galaxy Defender — Clean Modern Dark Design System
-   Course: Software for Enterprise
-   Style: Minimalist Dark Titanium, Electric Indigo & Crisp Accents
+   Galaxy Defender — Cyber-Cosmic Sci-Fi Design System
+   Style: Deep Obsidian Void, Glowing Neon Cyan, Electric Plasma & Radiant Gold
    Typography: 'Orbitron' (Headings) + 'Inter' (Interface) + 'JetBrains Mono' (Stats)
    ==================================================================== */
 
@@ -13,39 +12,48 @@
     --navbar-width:   min(880px, 96vw);
     --showcase-width: min(1080px, 96vw);
 
-    /* ── Clean Dark Palette (Graphite / Slate) ── */
-    --bg-page:        #090c15;
-    --bg-surface:     #0f1422;
-    --bg-card:        #141a2c;
-    --bg-card-hover:  #182035;
-    --bg-overlay:     rgba(9, 12, 21, 0.92);
+    /* ── Deep Cyber-Cosmic Obsidian Palette ── */
+    --bg-page:        #050814;
+    --bg-surface:     #0b1229;
+    --bg-card:        rgba(15, 23, 52, 0.82);
+    --bg-card-hover:  rgba(22, 33, 72, 0.90);
+    --bg-overlay:     rgba(5, 8, 20, 0.94);
 
-    /* ── Clean 1px Borders ── */
-    --border-subtle:  rgba(255, 255, 255, 0.08);
-    --border-card:    rgba(255, 255, 255, 0.12);
-    --border-focus:   #6366f1;
+    /* ── Sleek Glowing Neon Accents ── */
+    --cyan:           #00f0ff;
+    --cyan-glow:      rgba(0, 240, 255, 0.35);
+    --cyan-soft:      rgba(0, 240, 255, 0.12);
 
-    /* ── Simple, Cohesive Accent Colors ── */
-    --primary:        #4f46e5;
-    --primary-light:  #6366f1;
-    --primary-glow:   rgba(99, 102, 241, 0.25);
+    --primary:        #00e5ff;
+    --primary-light:  #38bdf8;
+    --primary-glow:   rgba(0, 229, 255, 0.40);
 
-    --amber:          #f59e0b;
-    --amber-soft:     rgba(245, 158, 11, 0.12);
+    --indigo:         #6366f1;
+    --indigo-glow:    rgba(99, 102, 241, 0.35);
 
-    --emerald:        #10b981;
-    --emerald-soft:   rgba(16, 185, 129, 0.12);
+    --amber:          #ffb703;
+    --amber-soft:     rgba(255, 183, 3, 0.14);
+    --amber-glow:     rgba(255, 183, 3, 0.40);
 
-    --sky:            #0ea5e9;
-    --sky-soft:       rgba(14, 165, 233, 0.12);
+    --emerald:        #00f59b;
+    --emerald-soft:   rgba(0, 245, 155, 0.14);
+    --emerald-glow:   rgba(0, 245, 155, 0.40);
 
-    --purple:         #8b5cf6;
-    --purple-soft:    rgba(139, 92, 246, 0.12);
+    --purple:         #a855f7;
+    --purple-soft:    rgba(168, 85, 247, 0.14);
+    --purple-glow:    rgba(168, 85, 247, 0.40);
 
-    --crimson:        #ef4444;
+    --crimson:        #ff3366;
+    --crimson-glow:   rgba(255, 51, 102, 0.40);
+
+    /* ── Luminous 1px Borders ── */
+    --border-subtle:  rgba(0, 240, 255, 0.10);
+    --border-card:    rgba(0, 240, 255, 0.18);
+    --border-glow:    rgba(0, 240, 255, 0.45);
+    --border-focus:   #00f0ff;
 
     /* ── Semantic Mappings for Game Systems ── */
-    --cyan-primary:   var(--primary-light);
+    --cyan-primary:   var(--cyan);
     --gold-primary:   var(--amber);
     --green-primary:  var(--emerald);
     --purple-primary: var(--purple);
@@ -54,16 +62,16 @@
 
     --theme-vc:       var(--emerald);
     --theme-api:      var(--amber);
-    --theme-event:    var(--sky);
+    --theme-event:    var(--cyan);
     --theme-id:       var(--purple);
 
-    --border-gold:    rgba(245, 158, 11, 0.40);
-    --border-green:   rgba(16, 185, 129, 0.40);
-    --border-danger:  rgba(239, 68, 68, 0.40);
+    --border-gold:    rgba(255, 183, 3, 0.45);
+    --border-green:   rgba(0, 245, 155, 0.45);
+    --border-danger:  rgba(255, 51, 102, 0.45);
 
     /* ── Typography & Readability ── */
     --text-title:     #ffffff;
-    --text-primary:   #f1f5f9;
+    --text-primary:   #f8fafc;
     --text-secondary: #94a3b8;
     --text-muted:     #64748b;
 
@@ -77,14 +85,15 @@
     --radius-lg:      18px;
     --radius-pill:    9999px;
 
-    /* ── Clean Shadows ── */
-    --shadow-sm:      0 2px 8px rgba(0, 0, 0, 0.30);
-    --shadow-card:    0 8px 24px -4px rgba(0, 0, 0, 0.50);
-    --shadow-modal:   0 20px 48px -8px rgba(0, 0, 0, 0.70);
+    /* ── Glowing Futuristic Shadows ── */
+    --shadow-sm:      0 2px 10px rgba(0, 0, 0, 0.40);
+    --shadow-card:    0 8px 30px -4px rgba(0, 0, 0, 0.60), 0 0 16px rgba(0, 240, 255, 0.10);
+    --shadow-glow:    0 0 24px rgba(0, 240, 255, 0.25);
+    --shadow-modal:   0 24px 60px -8px rgba(0, 0, 0, 0.85), 0 0 30px rgba(0, 240, 255, 0.15);
 
     /* ── Transition ── */
-    --t-fast:         0.15s ease;
-    --t-smooth:       0.25s ease;
+    --t-fast:         0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    --t-smooth:       0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* =========================================================================
@@ -115,15 +124,16 @@ body {
     align-items: center;
     padding: 0 12px;
 
-    /* Clean, tasteful dark background with very subtle ambient light */
+    /* High-End Cosmic Void Ambient Atmosphere */
     background-image:
-        radial-gradient(ellipse 80% 50% at 50% -10%, rgba(99, 102, 241, 0.08) 0%, transparent 60%),
-        radial-gradient(ellipse 60% 40% at 50% 100%, rgba(14, 165, 233, 0.05) 0%, transparent 60%);
+        radial-gradient(ellipse 90% 60% at 50% -15%, rgba(0, 240, 255, 0.12) 0%, transparent 65%),
+        radial-gradient(ellipse 70% 50% at 80% 90%, rgba(99, 102, 241, 0.10) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 20% 60%, rgba(168, 85, 247, 0.06) 0%, transparent 50%);
     background-attachment: fixed;
 }
 
 /* =========================================================================
-   Top Navigation Bar
+   Top Navigation Bar — Holographic Dock
    ========================================================================= */
 .top-navbar {
     width: 100%;
@@ -131,18 +141,21 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 16px;
+    padding: 10px 18px;
     margin: 12px auto 0;
-    background: var(--bg-surface);
+    background: linear-gradient(180deg, rgba(16, 24, 52, 0.88) 0%, rgba(9, 14, 32, 0.94) 100%);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
     border: 1px solid var(--border-card);
     border-radius: var(--radius-md);
-    box-shadow: var(--shadow-sm);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
     z-index: 50;
-    transition: border-color var(--t-smooth);
+    transition: all var(--t-smooth);
 }
 
 .top-navbar:hover {
-    border-color: rgba(255, 255, 255, 0.20);
+    border-color: var(--border-glow);
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.6), 0 0 15px rgba(0, 240, 255, 0.12);
 }
 
 .brand-section {
@@ -159,14 +172,17 @@ body {
     align-items: center;
     justify-content: center;
     border-radius: var(--radius-sm);
-    background: rgba(99, 102, 241, 0.15);
-    border: 1px solid rgba(99, 102, 241, 0.35);
-    font-size: 18px;
-    transition: transform var(--t-fast);
+    background: linear-gradient(135deg, rgba(0, 240, 255, 0.20) 0%, rgba(99, 102, 241, 0.25) 100%);
+    border: 1px solid rgba(0, 240, 255, 0.40);
+    color: var(--cyan);
+    box-shadow: 0 0 14px rgba(0, 240, 255, 0.25);
+    transition: all var(--t-fast);
 }
 
 .brand-section:hover .brand-logo-icon {
-    transform: scale(1.05);
+    transform: scale(1.08) rotate(-4deg);
+    border-color: var(--cyan);
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.50);
 }
 
 .brand-title {
@@ -174,21 +190,23 @@ body {
     font-size: 17px;
     font-weight: 800;
     letter-spacing: 1.5px;
-    color: var(--text-title);
+    color: #ffffff;
     text-transform: uppercase;
     line-height: 1.2;
+    text-shadow: 0 0 12px rgba(0, 240, 255, 0.4);
 }
 
 .brand-subtitle {
     font-size: 10px;
-    color: var(--text-secondary);
-    letter-spacing: 1px;
+    color: var(--cyan);
+    letter-spacing: 1.2px;
     text-transform: uppercase;
     font-family: var(--font-heading);
     display: flex;
     align-items: center;
     gap: 6px;
     margin-top: 2px;
+    opacity: 0.9;
 }
 
 .brand-subtitle::before {
@@ -197,7 +215,13 @@ body {
     height: 6px;
     border-radius: 50%;
     background: var(--emerald);
-    box-shadow: 0 0 6px var(--emerald);
+    box-shadow: 0 0 8px var(--emerald);
+    animation: pulseGlow 2s ease-in-out infinite;
+}
+
+@keyframes pulseGlow {
+    0%, 100% { opacity: 0.7; transform: scale(0.9); }
+    50% { opacity: 1; transform: scale(1.15); }
 }
 
 .nav-actions {
@@ -262,17 +286,17 @@ body {
 }
 
 /* =========================================================================
-   Button System (Simple, Clean, Polished)
+   Button System (Sleek Cyberpunk Sci-Fi)
    ========================================================================= */
 .btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: 7px;
     font-family: var(--font-body);
     font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 0.3px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
     text-decoration: none;
     padding: 8px 14px;
     border-radius: var(--radius-sm);
@@ -283,48 +307,64 @@ body {
     white-space: nowrap;
 }
 
-.btn:active {
-    transform: scale(0.98);
+.btn svg {
+    flex-shrink: 0;
+    transition: transform var(--t-fast);
 }
 
-/* Primary — Solid Electric Blue */
+.btn:hover svg {
+    transform: scale(1.15);
+}
+
+.btn:active {
+    transform: scale(0.97);
+}
+
+/* Primary — Cyber Neon Cyan Gradient with High Contrast */
 .btn-primary {
-    background: var(--primary);
-    color: #ffffff;
-    border-color: var(--primary-light);
-    box-shadow: 0 2px 8px rgba(79, 70, 229, 0.35);
+    background: linear-gradient(135deg, #00e5ff 0%, #3b82f6 100%);
+    color: #040817;
+    font-weight: 800;
+    border-color: rgba(255, 255, 255, 0.4);
+    box-shadow: 0 2px 12px rgba(0, 229, 255, 0.35);
 }
 
 .btn-primary:hover {
-    background: var(--primary-light);
-    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.45);
+    background: linear-gradient(135deg, #38e1ff 0%, #60a5fa 100%);
+    box-shadow: 0 4px 20px rgba(0, 229, 255, 0.55), 0 0 25px rgba(0, 229, 255, 0.25);
     transform: translateY(-1px);
+    color: #020510;
 }
 
-/* Banana API Button — Clean Amber */
+/* Banana API Button — Radiant Solar Amber Matrix */
 .btn-banana {
-    background: var(--amber-soft);
-    color: #fbbf24;
-    border: 1px solid rgba(245, 158, 11, 0.35);
+    background: linear-gradient(135deg, rgba(255, 183, 3, 0.16) 0%, rgba(217, 119, 6, 0.22) 100%);
+    color: #ffbe0b;
+    border: 1px solid rgba(255, 190, 11, 0.45);
+    box-shadow: 0 2px 8px rgba(255, 190, 11, 0.15);
 }
 
 .btn-banana:hover {
-    background: rgba(245, 158, 11, 0.22);
-    border-color: var(--amber);
+    background: linear-gradient(135deg, rgba(255, 183, 3, 0.28) 0%, rgba(217, 119, 6, 0.35) 100%);
+    border-color: #ffbe0b;
     color: #ffffff;
+    box-shadow: 0 4px 18px rgba(255, 190, 11, 0.45);
     transform: translateY(-1px);
 }
 
-/* Secondary Button — Neutral Border */
+/* Secondary Button — Sleek Translucent Glass with Cyan Glow */
 .btn-secondary {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(16, 24, 52, 0.65);
     color: var(--text-primary);
     border: 1px solid var(--border-card);
+    backdrop-filter: blur(8px);
 }
 
 .btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.10);
-    border-color: rgba(255, 255, 255, 0.25);
+    background: rgba(24, 36, 76, 0.85);
+    border-color: var(--cyan);
+    color: #ffffff;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4), 0 0 12px rgba(0, 240, 255, 0.25);
     transform: translateY(-1px);
 }
 
@@ -551,7 +591,7 @@ body {
 }
 
 .overlay-card {
-    background: var(--bg-surface);
+    background: linear-gradient(150deg, rgba(16, 26, 62, 0.95) 0%, rgba(8, 12, 30, 0.98) 100%);
     border: 1px solid var(--border-card);
     border-radius: var(--radius-lg);
     padding: 32px 36px;
@@ -559,6 +599,26 @@ body {
     width: 100%;
     text-align: center;
     box-shadow: var(--shadow-modal);
+    backdrop-filter: blur(16px);
+}
+
+.overlay-emblem {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0, 240, 255, 0.18) 0%, rgba(99, 102, 241, 0.05) 70%, transparent 100%);
+    border: 1px solid rgba(0, 240, 255, 0.35);
+    margin-bottom: 12px;
+    box-shadow: 0 0 24px rgba(0, 240, 255, 0.25);
+    animation: emblemPulse 3s ease-in-out infinite;
+}
+
+@keyframes emblemPulse {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(0, 240, 255, 0.25); }
+    50% { transform: scale(1.06); box-shadow: 0 0 32px rgba(0, 240, 255, 0.45); }
 }
 
 .overlay-title {
@@ -893,18 +953,20 @@ kbd {
 }
 
 .theme-card {
-    background: var(--bg-surface);
+    background: linear-gradient(150deg, rgba(16, 26, 60, 0.88) 0%, rgba(9, 14, 34, 0.95) 100%);
     border: 1px solid var(--border-card);
     border-radius: var(--radius-md);
-    padding: 18px 14px;
+    padding: 20px 16px;
     text-align: left;
-    transition: transform var(--t-smooth), border-color var(--t-smooth);
+    transition: all var(--t-smooth);
     position: relative;
     overflow: hidden;
     cursor: default;
+    backdrop-filter: blur(14px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
 }
 
-/* Clean 3px top accent bar */
+/* Glowing top accent strip */
 .theme-card::before {
     content: '';
     position: absolute;
@@ -913,48 +975,56 @@ kbd {
     right: 0;
     height: 3px;
     background: var(--tc-color);
+    box-shadow: 0 0 10px var(--tc-color);
 }
 
 .theme-card:hover {
-    transform: translateY(-3px);
+    transform: translateY(-4px);
     border-color: var(--tc-color);
-    box-shadow: var(--shadow-card);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6), 0 0 20px var(--tc-glow);
 }
 
-/* 4 Distinct Theme Colors */
-.theme-card:nth-child(1) { --tc-color: var(--theme-vc); }
-.theme-card:nth-child(2) { --tc-color: var(--theme-api); }
-.theme-card:nth-child(3) { --tc-color: var(--theme-event); }
-.theme-card:nth-child(4) { --tc-color: var(--theme-id); }
+/* 4 Distinct Theme Colors with Luminous Aura */
+.theme-card:nth-child(1) { --tc-color: var(--theme-vc); --tc-glow: var(--emerald-glow); }
+.theme-card:nth-child(2) { --tc-color: var(--theme-api); --tc-glow: var(--amber-glow); }
+.theme-card:nth-child(3) { --tc-color: var(--theme-event); --tc-glow: var(--cyan-glow); }
+.theme-card:nth-child(4) { --tc-color: var(--theme-id); --tc-glow: var(--purple-glow); }
 
 .theme-badge {
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    padding: 2px 8px;
+    padding: 3px 10px;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid var(--tc-color);
     border-radius: var(--radius-pill);
     font-size: 9px;
     font-family: var(--font-heading);
-    letter-spacing: 1px;
+    letter-spacing: 1.2px;
     color: var(--tc-color);
     text-transform: uppercase;
     font-weight: 700;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
 }
 
 .theme-icon-wrap {
-    width: 36px;
-    height: 36px;
+    width: 42px;
+    height: 42px;
     border-radius: var(--radius-sm);
     background: rgba(255, 255, 255, 0.04);
-    border: 1px solid var(--border-subtle);
+    border: 1px solid var(--tc-color);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
-    margin-bottom: 12px;
+    color: var(--tc-color);
+    margin-bottom: 14px;
+    box-shadow: 0 0 14px var(--tc-glow);
+    transition: all var(--t-fast);
+}
+
+.theme-card:hover .theme-icon-wrap {
+    transform: scale(1.1);
+    box-shadow: 0 0 22px var(--tc-glow);
 }
 
 .theme-title {

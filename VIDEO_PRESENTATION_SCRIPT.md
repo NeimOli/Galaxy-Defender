@@ -2,7 +2,7 @@
 
 > **Unit Code & Title:** CIS046-3 Software For Enterprise  
 > **Assignment:** 1 — Artifact Submission (Video Based on Code)  
-> **Student Name:** Sagar Thapa  
+> **Student Name:** Neim Bahadur Oli  
 > **Project Title:** Galaxy Defender — Space Shooter Game  
 > **Duration:** 10:00 Minutes Maximum  
 > **Core Themes Addressed:** Version Control, Interoperability, Event-Driven Programming, Virtual Identity

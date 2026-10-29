@@ -11,23 +11,35 @@
 
     <header class="top-navbar" style="max-width: 480px; width: 95%; margin: 16px auto 0;">
         <a href="index.html" class="brand-section">
-            <div class="brand-logo-icon">🚀</div>
+            <div class="brand-logo-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/>
+                    <path d="M12 11v7"/>
+                </svg>
+            </div>
             <div>
                 <div class="brand-title" style="font-size: 16px;">Galaxy Defender</div>
                 <div class="brand-subtitle">Commission New Pilot</div>
             </div>
         </a>
         <a href="index.html" class="btn btn-secondary" style="padding: 6px 14px; font-size: 10px;">
-            ← Return to Game
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            <span>Return</span>
         </a>
     </header>
 
     <main class="auth-container" style="max-width: 480px; width: 95%; margin: 20px auto;">
         <div class="auth-header">
-            <div style="font-size: 32px; margin-bottom: 6px;">🎖️</div>
+            <div style="margin-bottom: 10px; color: var(--emerald);">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <polygon points="12 2 15 8 22 9 17 14 18 21 12 17 6 21 7 14 2 9 9 8 12 2"/>
+                </svg>
+            </div>
             <h1 class="auth-title">PILOT COMMISSION</h1>
             <p style="font-size: 12px; color: var(--text-secondary);">
-                Register your virtual identity to establish military flight credentials and career ranking.
+                Register your flight credentials to establish military flight standing and career ranking.
             </p>
         </div>
 
@@ -43,12 +55,20 @@
             </div>
 
             <div class="form-group">
-                <label class="form-label">Select Pilot Avatar</label>
+                <label class="form-label">Select Pilot Insignia</label>
                 <div class="avatar-selector">
-                    <div class="avatar-option pilot_1 selected" data-avatar="pilot_1" title="Vanguard Blue">👨‍🚀</div>
-                    <div class="avatar-option pilot_2" data-avatar="pilot_2" title="Crimson Valkyrie">👩‍🚀</div>
-                    <div class="avatar-option pilot_3" data-avatar="pilot_3" title="Solar Falcon">🦅</div>
-                    <div class="avatar-option pilot_4" data-avatar="pilot_4" title="Cyber Phantom">🤖</div>
+                    <div class="avatar-option pilot_1 selected" data-avatar="pilot_1" title="Vanguard Blue">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a9 9 0 00-9 9c0 3.6 2.1 6.7 5.2 8.1V22h7.6v-2.9c3.1-1.4 5.2-4.5 5.2-8.1a9 9 0 00-9-9zm0 4a5 5 0 015 5c0 1.2-.4 2.3-1.1 3.2L12 11.5l-3.9 2.7c-.7-.9-1.1-2-1.1-3.2a5 5 0 015-5z"/></svg>
+                    </div>
+                    <div class="avatar-option pilot_2" data-avatar="pilot_2" title="Crimson Valkyrie">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15 8 22 9 17 14 18 21 12 17 6 21 7 14 2 9 9 8 12 2"/></svg>
+                    </div>
+                    <div class="avatar-option pilot_3" data-avatar="pilot_3" title="Solar Falcon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                    </div>
+                    <div class="avatar-option pilot_4" data-avatar="pilot_4" title="Cyber Phantom">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="9"/><circle cx="9" cy="10" r="1.5"/><circle cx="15" cy="10" r="1.5"/><path d="M8 15h8"/></svg>
+                    </div>
                 </div>
                 <input type="hidden" id="selectedAvatar" value="pilot_1">
             </div>
@@ -68,7 +88,10 @@
             </div>
 
             <button type="submit" id="btnSubmitRegister" class="btn btn-primary" style="width: 100%; padding: 13px; font-size: 12px; margin-top: 6px;">
-                🎖️ COMMISSION PILOT
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/>
+                </svg>
+                COMMISSION PILOT
             </button>
 
             <div id="authStatusMsg" class="auth-status-msg"></div>
