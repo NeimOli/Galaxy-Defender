@@ -2428,3 +2428,500 @@ kbd {
     border-bottom: 1px solid rgba(255, 215, 0, 0.14) !important;
   }
 }
+
+
+/* =========================================================================
+   AAA Sci-Fi Cyber-Stellar Gold & Neon Theme Enhancements
+   ========================================================================= */
+
+/* Smooth Modal & Overlay Entrance Animations */
+@keyframes sciFiScaleIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.92) translateY(12px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes spinSlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes spinRev {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+
+@keyframes goldPulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 28px rgba(255, 215, 0, 0.7);
+  }
+}
+
+/* ── Custom Glowing Sci-Fi Scrollbars ── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(5, 8, 20, 0.8);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 215, 0, 0.4);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #ffd700;
+  box-shadow: 0 0 10px #ffd700;
+}
+
+/* ── Top Navigation Bar Theme ── */
+.top-navbar {
+  max-width: 1120px !important;
+  background: linear-gradient(180deg, rgba(12, 18, 42, 0.94) 0%, rgba(6, 10, 24, 0.98) 100%) !important;
+  border: 1.5px solid rgba(255, 215, 0, 0.28) !important;
+  border-radius: 10px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7), 0 0 20px rgba(255, 183, 3, 0.12) !important;
+  padding: 10px 18px !important;
+  margin: 10px auto 0 !important;
+}
+
+.brand-logo-icon {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 8px !important;
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.25) 0%, rgba(255, 140, 0, 0.2) 100%) !important;
+  border: 1.5px solid #ffd700 !important;
+  color: #ffd700 !important;
+  box-shadow: 0 0 16px rgba(255, 215, 0, 0.45) !important;
+  transition: all 0.2s ease !important;
+}
+
+.brand-section:hover .brand-logo-icon {
+  transform: scale(1.08) rotate(-4deg) !important;
+  box-shadow: 0 0 24px rgba(255, 215, 0, 0.75) !important;
+}
+
+.brand-title {
+  font-family: var(--font-heading) !important;
+  font-size: 1.18rem !important;
+  font-weight: 900 !important;
+  letter-spacing: 2px !important;
+  background: linear-gradient(135deg, #ffffff 15%, #ffd700 70%, #ff8c00 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  text-transform: uppercase !important;
+  line-height: 1.2 !important;
+  filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.4)) !important;
+}
+
+.brand-subtitle {
+  font-size: 9.5px !important;
+  color: #00f0ff !important;
+  letter-spacing: 1.4px !important;
+  text-transform: uppercase !important;
+  font-family: var(--font-heading) !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  margin-top: 2px !important;
+  font-weight: 700 !important;
+}
+
+.brand-subtitle::before {
+  content: '' !important;
+  width: 6px !important;
+  height: 6px !important;
+  border-radius: 50% !important;
+  background: #00f59b !important;
+  box-shadow: 0 0 8px #00f59b !important;
+  animation: pulseGlow 1.8s ease-in-out infinite !important;
+}
+
+/* Pilot Badge Pill */
+.pilot-badge-pill {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 4px 12px 4px 5px !important;
+  background: rgba(255, 215, 0, 0.08) !important;
+  border: 1.5px solid rgba(255, 215, 0, 0.35) !important;
+  border-radius: 9999px !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+.pilot-badge-pill:hover {
+  background: rgba(255, 215, 0, 0.18) !important;
+  border-color: #ffd700 !important;
+  box-shadow: 0 0 16px rgba(255, 215, 0, 0.38) !important;
+  transform: translateY(-1px) !important;
+}
+
+.pilot-avatar-badge {
+  width: 28px !important;
+  height: 28px !important;
+  border-radius: 50% !important;
+  border: 1.5px solid #ffd700 !important;
+  background: rgba(255, 215, 0, 0.18) !important;
+  color: #ffd700 !important;
+}
+
+.pilot-callsign {
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  color: #ffffff !important;
+}
+
+.pilot-rank {
+  font-size: 9px !important;
+  font-family: var(--font-heading) !important;
+  letter-spacing: 1px !important;
+  color: #ffd700 !important;
+  text-transform: uppercase !important;
+  font-weight: 700 !important;
+}
+
+/* Banana API Button */
+.btn-banana {
+  background: linear-gradient(135deg, #ffd700 0%, #ff8c00 100%) !important;
+  color: #050814 !important;
+  border: none !important;
+  font-weight: 800 !important;
+  box-shadow: 0 0 14px rgba(255, 215, 0, 0.45) !important;
+  transition: all 0.15s ease !important;
+}
+
+.btn-banana:hover {
+  background: linear-gradient(135deg, #ffffff 0%, #ffd700 100%) !important;
+  box-shadow: 0 0 24px rgba(255, 215, 0, 0.75) !important;
+  transform: translateY(-2px) scale(1.03) !important;
+}
+
+/* Secondary Action Buttons */
+.btn-secondary {
+  background: rgba(14, 22, 52, 0.85) !important;
+  border: 1px solid rgba(0, 240, 255, 0.28) !important;
+  color: #f1f5f9 !important;
+  border-radius: 6px !important;
+  transition: all 0.15s ease !important;
+}
+
+.btn-secondary:hover {
+  background: rgba(24, 38, 85, 0.95) !important;
+  border-color: #00f0ff !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.35) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* ── Cockpit Tactical HUD Corner Brackets ── */
+.cockpit-bracket {
+  position: absolute !important;
+  width: 14px !important;
+  height: 14px !important;
+  pointer-events: none !important;
+  z-index: 15 !important;
+  transition: all 0.3s ease !important;
+}
+
+.cockpit-bracket.top-left {
+  top: 8px !important;
+  left: 8px !important;
+  border-top: 2.5px solid #ffd700 !important;
+  border-left: 2.5px solid #ffd700 !important;
+}
+
+.cockpit-bracket.top-right {
+  top: 8px !important;
+  right: 8px !important;
+  border-top: 2.5px solid #ffd700 !important;
+  border-right: 2.5px solid #ffd700 !important;
+}
+
+.cockpit-bracket.bottom-left {
+  bottom: 8px !important;
+  left: 8px !important;
+  border-bottom: 2.5px solid #ffd700 !important;
+  border-left: 2.5px solid #ffd700 !important;
+}
+
+.cockpit-bracket.bottom-right {
+  bottom: 8px !important;
+  right: 8px !important;
+  border-bottom: 2.5px solid #ffd700 !important;
+  border-right: 2.5px solid #ffd700 !important;
+}
+
+/* ── In-Canvas Cinematic Overlays ── */
+.game-overlay {
+  animation: sciFiScaleIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  background: rgba(6, 10, 26, 0.92) !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+.overlay-hologram-wrap {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin-bottom: 6px !important;
+}
+
+.hologram-ring {
+  position: absolute !important;
+  border-radius: 50% !important;
+  pointer-events: none !important;
+}
+
+.hologram-ring.outer {
+  width: 108px !important;
+  height: 108px !important;
+  border: 1.5px dashed rgba(255, 215, 0, 0.5) !important;
+  animation: spinSlow 16s linear infinite !important;
+}
+
+.hologram-ring.inner {
+  width: 92px !important;
+  height: 92px !important;
+  border: 1px solid rgba(0, 240, 255, 0.4) !important;
+  animation: spinRev 10s linear infinite !important;
+}
+
+.overlay-title {
+  font-family: var(--font-heading) !important;
+  font-size: 2.3rem !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.12em !important;
+  background: linear-gradient(135deg, #ffffff 15%, #ffd700 65%, #ff8c00 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.55)) !important;
+  text-align: center !important;
+  margin: 0 !important;
+}
+
+.overlay-sub {
+  font-size: 0.85rem !important;
+  color: rgba(255, 215, 0, 0.75) !important;
+  letter-spacing: 0.16em !important;
+  text-transform: uppercase !important;
+  margin: 0 !important;
+  font-weight: 700 !important;
+}
+
+.overlay-key-matrix {
+  display: flex !important;
+  gap: 10px !important;
+  flex-wrap: wrap !important;
+  justify-content: center !important;
+  margin: 10px 0 6px !important;
+}
+
+.key-pill {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  background: rgba(10, 16, 38, 0.85) !important;
+  border: 1px solid rgba(0, 240, 255, 0.25) !important;
+  padding: 4px 10px !important;
+  border-radius: 6px !important;
+  font-size: 0.75rem !important;
+  color: #94a3b8 !important;
+  font-weight: 600 !important;
+}
+
+.key-pill.highlight-gold {
+  border-color: rgba(255, 215, 0, 0.45) !important;
+  background: rgba(255, 215, 0, 0.08) !important;
+  color: #ffd700 !important;
+}
+
+.key-pill kbd {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  padding: 1px 6px !important;
+  border-radius: 3px !important;
+  font-family: monospace !important;
+  font-size: 0.72rem !important;
+}
+
+.btn-launch {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  padding: 14px 40px !important;
+  background: linear-gradient(135deg, #ffd700 0%, #ff8c00 100%) !important;
+  color: #050814 !important;
+  font-family: var(--font-heading) !important;
+  font-size: 1rem !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.14em !important;
+  border: none !important;
+  border-radius: 8px !important;
+  cursor: pointer !important;
+  box-shadow: 0 0 25px rgba(255, 215, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.6) !important;
+  transition: all 0.18s ease !important;
+  margin-top: 6px !important;
+}
+
+.btn-launch:hover {
+  transform: translateY(-2px) scale(1.04) !important;
+  background: linear-gradient(135deg, #ffffff 0%, #ffd700 100%) !important;
+  box-shadow: 0 0 40px rgba(255, 215, 0, 0.85) !important;
+}
+
+/* ── Modals High-Tech Polish ── */
+.modal-overlay {
+  background: rgba(4, 7, 18, 0.85) !important;
+  backdrop-filter: blur(12px) !important;
+}
+
+.modal-content, .modal-card, .records-modal-card {
+  background: linear-gradient(135deg, rgba(12, 18, 44, 0.98) 0%, rgba(6, 10, 26, 0.98) 100%) !important;
+  border: 1.5px solid rgba(255, 215, 0, 0.32) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.9), 0 0 35px rgba(255, 183, 3, 0.14) !important;
+  animation: sciFiScaleIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.modal-header {
+  border-bottom: 1px solid rgba(255, 215, 0, 0.18) !important;
+  padding: 16px 20px !important;
+}
+
+.modal-title {
+  font-family: var(--font-heading) !important;
+  color: #ffffff !important;
+  font-size: 1.15rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.08em !important;
+}
+
+.modal-close-btn, .modal-close {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  color: #94a3b8 !important;
+  border-radius: 6px !important;
+  transition: all 0.15s ease !important;
+}
+
+.modal-close-btn:hover, .modal-close:hover {
+  background: rgba(255, 215, 0, 0.15) !important;
+  border-color: #ffd700 !important;
+  color: #ffd700 !important;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.4) !important;
+}
+
+/* Banana Cipher CRT Pad */
+.banana-key-btn {
+  background: rgba(14, 22, 52, 0.9) !important;
+  border: 1.5px solid rgba(255, 215, 0, 0.35) !important;
+  color: #ffd700 !important;
+  font-family: 'Orbitron', monospace !important;
+  font-size: 1.15rem !important;
+  font-weight: 800 !important;
+  border-radius: 8px !important;
+  padding: 10px 0 !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+
+.banana-key-btn:hover {
+  background: linear-gradient(135deg, #ffd700, #ff8c00) !important;
+  color: #050814 !important;
+  border-color: #ffffff !important;
+  box-shadow: 0 0 16px rgba(255, 215, 0, 0.6) !important;
+  transform: translateY(-2px) scale(1.05) !important;
+}
+
+/* Records Modal Enhancements */
+.records-tabs-bar {
+  display: flex !important;
+  gap: 8px !important;
+  border-bottom: 1.5px solid rgba(255, 215, 0, 0.18) !important;
+  padding: 0 20px !important;
+}
+
+.records-tab-btn {
+  font-family: var(--font-heading) !important;
+  font-size: 0.78rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.08em !important;
+  padding: 10px 16px !important;
+  background: transparent !important;
+  border: none !important;
+  border-bottom: 2px solid transparent !important;
+  color: #94a3b8 !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+
+.records-tab-btn.active {
+  color: #ffd700 !important;
+  border-bottom-color: #ffd700 !important;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.4) !important;
+}
+
+.records-search-input, .records-filter-select, .form-input {
+  background: rgba(8, 12, 30, 0.85) !important;
+  border: 1px solid rgba(255, 215, 0, 0.28) !important;
+  color: #ffffff !important;
+  border-radius: 6px !important;
+  padding: 7px 12px !important;
+  font-family: var(--font-body) !important;
+  font-size: 0.82rem !important;
+  transition: all 0.15s ease !important;
+}
+
+.records-search-input:focus, .records-filter-select:focus, .form-input:focus {
+  border-color: #ffd700 !important;
+  box-shadow: 0 0 14px rgba(255, 215, 0, 0.35) !important;
+  outline: none !important;
+}
+
+/* Telemetry Table Highlights */
+.telemetry-table thead th {
+  color: #ffd700 !important;
+  border-bottom: 1.5px solid rgba(255, 215, 0, 0.25) !important;
+}
+
+.table-row:hover {
+  background: rgba(255, 215, 0, 0.06) !important;
+}
+
+.my-flight-row {
+  border-left: 3px solid #ffd700 !important;
+  background: rgba(255, 215, 0, 0.08) !important;
+}
+
+.rank-badge.rank-1 {
+  color: #ffd700 !important;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.6) !important;
+}
+
+.rank-badge.rank-2 {
+  color: #e2e8f0 !important;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.5) !important;
+}
+
+.rank-badge.rank-3 {
+  color: #f59e0b !important;
+  text-shadow: 0 0 8px rgba(245, 158, 11, 0.5) !important;
+}
+
+.you-pill {
+  color: #ffd700 !important;
+  background: rgba(255, 215, 0, 0.15) !important;
+  border-color: rgba(255, 215, 0, 0.45) !important;
+  box-shadow: 0 0 8px rgba(255, 215, 0, 0.3) !important;
+}

@@ -224,8 +224,13 @@ export default function App() {
           }}
         />
 
-        {/* Canvas wrapper */}
+        {/* Canvas wrapper with Cockpit HUD Brackets */}
         <div className="canvas-container">
+          <div className="cockpit-bracket top-left" aria-hidden="true" />
+          <div className="cockpit-bracket top-right" aria-hidden="true" />
+          <div className="cockpit-bracket bottom-left" aria-hidden="true" />
+          <div className="cockpit-bracket bottom-right" aria-hidden="true" />
+
           <GameCanvas
             gameState={gameState}
             onStateChange={handleStateChange}
@@ -241,26 +246,34 @@ export default function App() {
           {/* Main Menu Overlay */}
           {showMainMenu && (
             <div className="game-overlay menu-overlay" id="mainMenuOverlay">
-              <div className="overlay-emblem" aria-hidden="true">
-                <svg width="70" height="70" viewBox="0 0 100 100" fill="none">
-                  <polygon points="50,5 61,35 95,35 68,57 79,91 50,70 21,91 32,57 5,35 39,35" fill="rgba(0,240,255,0.15)" stroke="#00f0ff" strokeWidth="1.5"/>
-                  <circle cx="50" cy="50" r="18" fill="rgba(0,240,255,0.12)" stroke="#00f0ff" strokeWidth="1.2"/>
-                  <polygon points="50,30 56,44 72,44 60,53 65,67 50,58 35,67 40,53 28,44 44,44" fill="#00f0ff" opacity="0.7"/>
-                </svg>
+              <div className="overlay-hologram-wrap">
+                <div className="hologram-ring outer" />
+                <div className="hologram-ring inner" />
+                <div className="overlay-emblem" aria-hidden="true">
+                  <svg width="78" height="78" viewBox="0 0 100 100" fill="none">
+                    <polygon points="50,4 63,33 96,33 69,55 80,89 50,68 20,89 31,55 4,33 37,33" fill="rgba(255,215,0,0.18)" stroke="#ffd700" strokeWidth="1.8"/>
+                    <circle cx="50" cy="50" r="19" fill="rgba(0,240,255,0.12)" stroke="#00f0ff" strokeWidth="1.5"/>
+                    <polygon points="50,28 57,43 73,43 60,53 65,68 50,59 35,68 40,53 27,43 43,43" fill="#ffd700" opacity="0.9"/>
+                  </svg>
+                </div>
               </div>
               <h1 className="overlay-title">GALAXY DEFENDER</h1>
-              <p className="overlay-sub">Tactical Deep Space Defense</p>
-              <div className="overlay-hint">
-                <kbd>SPACE</kbd> or <kbd>ENTER</kbd> to launch
+              <p className="overlay-sub">Tactical Deep Space Defense // Sector Perimeter</p>
+
+              <div className="overlay-key-matrix">
+                <div className="key-pill"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> <span>Flight Maneuver</span></div>
+                <div className="key-pill"><kbd>SPACE</kbd> <span>Plasma Laser</span></div>
+                <div className="key-pill highlight-gold"><kbd>B</kbd> <span>Mega Bomb</span></div>
               </div>
+
               <button className="btn-launch" onClick={handleStartGame}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                   <polygon points="5 3 19 12 5 21 5 3"/>
                 </svg>
                 LAUNCH MISSION
               </button>
               <p className="overlay-hint2">
-                Mouse drag · Arrow keys · WASD · Touch to pilot
+                Click · Drag · Keyboard · WASD · Full Touch Compatible
               </p>
             </div>
           )}
@@ -269,20 +282,22 @@ export default function App() {
           {showPause && (
             <div className="game-overlay pause-overlay" id="pauseOverlay">
               <div className="overlay-icon-sm">
-                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#00f0ff" strokeWidth="1.8">
-                  <rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>
+                <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#ffd700" strokeWidth="2">
+                  <rect x="6" y="4" width="4" height="16" rx="1"/>
+                  <rect x="14" y="4" width="4" height="16" rx="1"/>
                 </svg>
               </div>
-              <h2 className="overlay-title" style={{ fontSize: '1.8rem' }}>MISSION PAUSED</h2>
+              <h2 className="overlay-title" style={{ fontSize: '1.9rem', color: '#ffd700' }}>SIMULATION SUSPENDED</h2>
+              <p className="overlay-sub" style={{ color: 'rgba(255, 215, 0, 0.75)' }}>Flight Systems On Standby // Sector 1</p>
               <div className="overlay-btn-group">
                 <button className="btn-launch" onClick={handlePauseToggle}>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                     <polygon points="5 3 19 12 5 21 5 3"/>
                   </svg>
-                  Resume
+                  RESUME MISSION
                 </button>
                 <button className="btn-secondary" onClick={() => window.game?.quitToMenu()}>
-                  Quit to Menu
+                  ABORT TO BASE
                 </button>
               </div>
             </div>
@@ -292,26 +307,26 @@ export default function App() {
           {showGameOver && (
             <div className="game-overlay gameover-overlay" id="gameOverOverlay">
               <div className="overlay-icon-sm">
-                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ff3366" strokeWidth="1.8">
+                <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="#ff3366" strokeWidth="2">
                   <circle cx="12" cy="12" r="10"/>
                   <line x1="15" y1="9" x2="9" y2="15"/>
                   <line x1="9" y1="9" x2="15" y2="15"/>
                 </svg>
               </div>
-              <h2 className="overlay-title" style={{ color: '#ff3366', fontSize: '1.8rem' }}>HULL BREACHED</h2>
-              <p className="overlay-sub" style={{ color: '#ff3366' }}>Mission Failed — Sector Lost</p>
+              <h2 className="overlay-title" style={{ color: '#ff3366', fontSize: '2rem' }}>HULL INTEGRITY ZERO</h2>
+              <p className="overlay-sub" style={{ color: 'rgba(255, 51, 102, 0.85)' }}>Spacecraft Destroyed // Sector Lost</p>
               <div className="overlay-score-final">
-                Final Score: <strong>{hud.score.toLocaleString()}</strong>
+                Mission Combat Score: <strong>{hud.score.toLocaleString()}</strong>
               </div>
               <div className="overlay-btn-group">
                 <button className="btn-launch" onClick={handleStartGame}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
                     <polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
                   </svg>
-                  Retry Mission
+                  DEPLOY NEW CRAFT
                 </button>
                 <button className="btn-secondary" onClick={() => setModal('leaderboard')}>
-                  Leaderboard
+                  VIEW FLIGHT RECORDS
                 </button>
               </div>
             </div>
@@ -321,21 +336,21 @@ export default function App() {
           {showVictory && (
             <div className="game-overlay victory-overlay" id="victoryOverlay">
               <div className="overlay-emblem">
-                <svg width="60" height="60" viewBox="0 0 24 24" fill="#ffb703">
+                <svg width="68" height="68" viewBox="0 0 24 24" fill="#ffd700">
                   <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
                 </svg>
               </div>
-              <h2 className="overlay-title" style={{ color: '#ffb703', fontSize: '1.8rem' }}>SECTOR SECURED</h2>
-              <p className="overlay-sub" style={{ color: '#ffb703' }}>Victory — All Threats Eliminated</p>
+              <h2 className="overlay-title" style={{ color: '#ffd700', fontSize: '2.1rem' }}>SECTOR SECURED</h2>
+              <p className="overlay-sub" style={{ color: 'rgba(255, 215, 0, 0.85)' }}>Hostile Swarm Neutralized // Fleet Commended</p>
               <div className="overlay-score-final">
-                Final Score: <strong>{hud.score.toLocaleString()}</strong>
+                Combat Performance Score: <strong>{hud.score.toLocaleString()}</strong>
               </div>
               <div className="overlay-btn-group">
-                <button className="btn-launch" style={{ background: 'linear-gradient(135deg, #ffb703, #ff8c00)' }} onClick={handleStartGame}>
-                  Next Sector
+                <button className="btn-launch" onClick={handleStartGame}>
+                  NEXT SECTOR ASSIGNMENT
                 </button>
                 <button className="btn-secondary" onClick={() => setModal('leaderboard')}>
-                  Submit Score
+                  COMMENDATION RECORDS
                 </button>
               </div>
             </div>
