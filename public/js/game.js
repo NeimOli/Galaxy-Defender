@@ -744,8 +744,14 @@ class GameEngine {
     triggerMegaBomb() {
         if (!this.player) return;
 
-        // Only allow detonating while mission is actively playing
+        // If game is in MENU or PAUSED, auto-start or resume
         if (this.state !== 'PLAYING') {
+            if (this.state === 'MENU') {
+                this.startGame();
+                this.particles.addFloatingText('MISSION ENGAGED! PRESS [B] TO DETONATE MEGA BOMB', this.width / 2, this.height * 0.4, '#ffd700');
+            } else if (this.state === 'PAUSED') {
+                this.resumeGame();
+            }
             return;
         }
 
@@ -1016,7 +1022,8 @@ class GameEngine {
                 eb.isDestroyed = true;
                 this.screenShake = 8;
                 this.particles.addExplosion(eb.x, eb.y, '#ff0055', 12);
-                this.player.takeDamage(20, this.audio);
+                this.player.takeDamage(20, this.audio, this.particles);
+                this.updateHUD();
                 if (this.player.lives <= 0) {
                     this.handleGameOver();
                     return;
@@ -1037,7 +1044,8 @@ class GameEngine {
                 this.enemies.splice(i, 1);
                 this.screenShake = 14;
                 this.particles.addExplosion(e.x + e.width / 2, e.y + e.height / 2, '#ff3300', 25);
-                this.player.takeDamage(35, this.audio);
+                this.player.takeDamage(35, this.audio, this.particles);
+                this.updateHUD();
                 if (this.player.lives <= 0) {
                     this.handleGameOver();
                     return;

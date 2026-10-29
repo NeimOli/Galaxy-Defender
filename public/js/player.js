@@ -117,7 +117,11 @@ class Player {
         this.shieldRegenTimer++;
         if (this.shieldRegenTimer > 180) { // After 3 seconds without taking damage
             if (this.shield < this.maxShield) {
-                this.shield = Math.min(this.maxShield, this.shield + 0.25);
+                const prevShield = this.shield;
+                this.shield = Math.min(this.maxShield, this.shield + 0.35);
+                if (prevShield < this.maxShield && this.shield >= this.maxShield && particleEngine) {
+                    particleEngine.addFloatingText('QUANTUM SHIELD 100% ONLINE', this.x + this.width / 2, this.y - 12, '#ffd700');
+                }
             }
         }
 
@@ -205,26 +209,50 @@ class Player {
     }
 
     /**
-     * Inflicts damage upon the player
+     * Inflicts damage upon the player:
+     * - Quantum Shield absorbs projectile/collision force first
+     * - When Quantum Shield breaks (0), Hull takes direct impact and loses 1 life
+     * - Fires visual floating combat text & sound
      */
-    takeDamage(amount, audioSynth) {
+    takeDamage(amount, audioSynth, particleEngine) {
         if (this.isInvulnerable) return false;
 
         this.shieldRegenTimer = 0;
+        const particles = particleEngine || window.game?.particles;
+        const centerX = this.x + this.width / 2;
+        const topY = this.y - 10;
 
         if (this.shield > 0) {
+            const absorbed = Math.min(Math.round(this.shield), amount);
             this.shield -= amount;
-            if (this.shield < 0) {
-                // Remainder penetrates to hull/lives
+
+            if (this.shield <= 0) {
                 this.shield = 0;
+                if (particles) {
+                    particles.addFloatingText('SHIELD COLLAPSED! HULL AT RISK!', centerX, topY, '#ff3366');
+                }
+            } else {
+                if (particles) {
+                    const color = this.shield < 30 ? '#ff8c00' : '#ffd700';
+                    particles.addFloatingText(`SHIELD DEFLECTED -${absorbed} [${Math.round(this.shield)}%]`, centerX, topY, color);
+                }
             }
             if (audioSynth) audioSynth.playShieldHit();
         } else {
-            // Shield broken, player loses a life
+            // Shield was already 0 — direct Hull breach!
             this.lives--;
-            this.shield = 50; // Partial emergency reboot
+            this.shield = 40; // Emergency reserve reboot
             this.isInvulnerable = true;
-            this.invulnerableTimer = 100; // ~1.6 seconds invulnerability
+            this.invulnerableTimer = 110; // ~1.8 seconds invulnerability
+
+            if (particles) {
+                particles.addFloatingText(
+                    `HULL BREACH! -1 LIFE (${Math.max(0, this.lives)} REMAINING)`,
+                    centerX,
+                    topY,
+                    '#ff0055'
+                );
+            }
             if (audioSynth) audioSynth.playPlayerExplosion();
         }
 
@@ -263,22 +291,25 @@ class Player {
         const hw = this.width / 2;
         const hh = this.height / 2;
 
-        // Active Shield Forcefield Bubble
+        // Active Shield Forcefield Bubble (Vibrant Golden-Cyan energetic aura)
         if (this.shield > 0) {
             const shieldRatio = this.shield / this.maxShield;
+            const shieldColor = shieldRatio < 0.25 ? '#ff3366' : (shieldRatio < 0.6 ? '#ffb703' : '#ffd700');
             ctx.save();
             ctx.beginPath();
-            ctx.ellipse(0, 0, hw + 10, hh + 10, 0, 0, Math.PI * 2);
-            ctx.strokeStyle = `rgba(0, 229, 255, ${0.15 + shieldRatio * 0.35})`;
-            ctx.lineWidth = 2.5;
-            ctx.shadowColor = '#00ffff';
-            ctx.shadowBlur = 12 * shieldRatio;
+            ctx.ellipse(0, 0, hw + 12, hh + 12, 0, 0, Math.PI * 2);
+            ctx.strokeStyle = shieldColor;
+            ctx.lineWidth = 2.4;
+            ctx.shadowColor = shieldColor;
+            ctx.shadowBlur = 14 * shieldRatio + 4;
+            ctx.globalAlpha = 0.4 + shieldRatio * 0.45;
             ctx.stroke();
 
-            // Forcefield hexagonal / shimmer gradient
-            const shieldGrad = ctx.createRadialGradient(0, 0, hw * 0.5, 0, 0, hw + 10);
-            shieldGrad.addColorStop(0, 'rgba(0, 255, 255, 0)');
-            shieldGrad.addColorStop(1, `rgba(0, 229, 255, ${0.08 * shieldRatio})`);
+            // Inner harmonic forcefield shimmer
+            const shieldGrad = ctx.createRadialGradient(0, 0, hw * 0.4, 0, 0, hw + 12);
+            shieldGrad.addColorStop(0, 'rgba(255, 215, 0, 0)');
+            shieldGrad.addColorStop(0.8, `${shieldColor}22`);
+            shieldGrad.addColorStop(1, `${shieldColor}55`);
             ctx.fillStyle = shieldGrad;
             ctx.fill();
             ctx.restore();
@@ -375,6 +406,45 @@ class Player {
         ctx.fill();
         ctx.shadowBlur = 0;
 
+        ctx.restore();
+
+        // On-Canvas Tactical Status HUD (Directly beneath ship)
+        // Shows shield percentage bar (Gold/Amber) and remaining Hull lives (3 Gold Dots)
+        const gaugeX = this.x + this.width / 2 - 18;
+        const gaugeY = this.y + this.height + 14;
+        const gaugeWidth = 36;
+        const gaugeHeight = 3.5;
+
+        ctx.save();
+        // Background track
+        ctx.fillStyle = 'rgba(5, 8, 20, 0.75)';
+        ctx.fillRect(gaugeX - 1, gaugeY - 1, gaugeWidth + 2, gaugeHeight + 2);
+
+        // Shield fill (Yellow/Gold / Amber / Crimson)
+        const shieldRatio = Math.max(0, Math.min(1, this.shield / this.maxShield));
+        if (shieldRatio > 0) {
+            ctx.fillStyle = shieldRatio < 0.25 ? '#ff3366' : (shieldRatio < 0.6 ? '#ffb703' : '#ffd700');
+            ctx.shadowColor = ctx.fillStyle;
+            ctx.shadowBlur = 4;
+            ctx.fillRect(gaugeX, gaugeY, gaugeWidth * shieldRatio, gaugeHeight);
+        }
+
+        // Hull Lives Pips (3 segmented gold dots below shield bar)
+        const pipsY = gaugeY + gaugeHeight + 4;
+        for (let i = 0; i < 3; i++) {
+            const pipX = gaugeX + 6 + i * 12;
+            ctx.beginPath();
+            ctx.arc(pipX, pipsY, 2.5, 0, Math.PI * 2);
+            if (i < this.lives) {
+                ctx.fillStyle = '#ffd700';
+                ctx.shadowColor = '#ffd700';
+                ctx.shadowBlur = 4;
+            } else {
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.18)';
+                ctx.shadowBlur = 0;
+            }
+            ctx.fill();
+        }
         ctx.restore();
     }
 }

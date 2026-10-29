@@ -137,15 +137,31 @@ export default function App() {
     else if (gameState === 'PAUSED') window.game.resumeGame();
   };
 
-  // ── Keep user in sync if API session changes externally ──────────────────
+  // ── Keep user in sync if API session changes externally & global shortcuts ──
   useEffect(() => {
     const sync = () => setUser(API.getCurrentUser());
     const openBanana = () => setModal('banana');
+
+    const handleGlobalKey = (e) => {
+      // Trigger mega bomb on 'B' if not inside an input
+      if (e.code === 'KeyB' || e.key === 'b' || e.key === 'B') {
+        const tag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
+        if (tag !== 'input' && tag !== 'textarea') {
+          if (window.game) {
+            window.game.triggerMegaBomb();
+          }
+        }
+      }
+    };
+
     window.addEventListener('virtual_identity_changed', sync);
     window.addEventListener('open_banana_challenge', openBanana);
+    window.addEventListener('keydown', handleGlobalKey);
+
     return () => {
       window.removeEventListener('virtual_identity_changed', sync);
       window.removeEventListener('open_banana_challenge', openBanana);
+      window.removeEventListener('keydown', handleGlobalKey);
     };
   }, []);
 
@@ -201,6 +217,11 @@ export default function App() {
           score={hud.score}
           level={hud.level}
           user={user}
+          onTriggerBomb={() => {
+            if (window.game) {
+              window.game.triggerMegaBomb();
+            }
+          }}
         />
 
         {/* Canvas wrapper */}
