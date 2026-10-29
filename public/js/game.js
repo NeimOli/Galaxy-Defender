@@ -586,15 +586,19 @@ class GameEngine {
             this.keys.shoot = false;
         });
 
-        // UI Button Event Listeners
-        document.getElementById('btnStartGame').addEventListener('click', () => this.startGame());
-        document.getElementById('btnSoundToggle').addEventListener('click', () => this.toggleSound());
-        document.getElementById('btnLeaderboard').addEventListener('click', () => this.openLeaderboard());
-        document.getElementById('btnBananaMatrix').addEventListener('click', () => this.triggerBananaChallenge('manual'));
-        document.getElementById('btnRestart').addEventListener('click', () => this.startGame());
-        document.getElementById('btnResume').addEventListener('click', () => this.resumeGame());
-        document.getElementById('btnQuit').addEventListener('click', () => this.quitToMenu());
-        document.getElementById('btnProfile').addEventListener('click', () => this.openProfileModal());
+        // Safe UI Button Event Listeners
+        const addClick = (id, fn) => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('click', fn);
+        };
+        addClick('btnStartGame', () => this.startGame());
+        addClick('btnSoundToggle', () => this.toggleSound());
+        addClick('btnLeaderboard', () => this.openLeaderboard());
+        addClick('btnBananaMatrix', () => this.triggerBananaChallenge('manual'));
+        addClick('btnRestart', () => this.startGame());
+        addClick('btnResume', () => this.resumeGame());
+        addClick('btnQuit', () => this.quitToMenu());
+        addClick('btnProfile', () => this.openProfileModal());
 
         // Mobile touch & click bomb & pause helpers
         const hudBombGroup = document.getElementById('hudBombGroup');
@@ -649,7 +653,9 @@ class GameEngine {
     }
 
     loadPilotProfile() {
-        const user = window.API.getCurrentUser();
+        const user = (window.API && typeof window.API.getCurrentUser === 'function')
+            ? window.API.getCurrentUser()
+            : { callsign: 'Cadet', rank: 'Cadet', avatar: 'pilot_1', shipClass: 'Interceptor' };
         const callsignEl = document.getElementById('hudPilotCallsign');
         const rankEl = document.getElementById('hudPilotRank');
         const avatarEl = document.getElementById('hudPilotAvatar');
@@ -685,42 +691,54 @@ class GameEngine {
 
         this.player.reset(this.width, this.height);
 
-        // Hide overlay menus
-        document.getElementById('mainMenuOverlay').classList.add('hidden');
-        document.getElementById('gameOverOverlay').classList.add('hidden');
-        document.getElementById('pauseOverlay').classList.add('hidden');
-        document.getElementById('bananaChallengeModal').classList.add('hidden');
+        // Safe hide overlay menus
+        const hide = (id) => { const el = document.getElementById(id); if (el) el.classList.add('hidden'); };
+        hide('mainMenuOverlay');
+        hide('gameOverOverlay');
+        hide('pauseOverlay');
+        hide('bananaChallengeModal');
 
         this.particles.addFloatingText('SECTOR 1: PERIMETER ENGAGED', this.width / 2, this.height / 2, '#00ffcc');
         this.updateHUD();
+        if (this.onStateChange) this.onStateChange('PLAYING');
     }
 
     pauseGame() {
         this.state = 'PAUSED';
-        document.getElementById('pauseOverlay').classList.remove('hidden');
+        const el = document.getElementById('pauseOverlay');
+        if (el) el.classList.remove('hidden');
+        if (this.onStateChange) this.onStateChange('PAUSED');
     }
 
     resumeGame() {
         this.state = 'PLAYING';
-        document.getElementById('pauseOverlay').classList.add('hidden');
+        const el = document.getElementById('pauseOverlay');
+        if (el) el.classList.add('hidden');
+        if (this.onStateChange) this.onStateChange('PLAYING');
     }
 
     quitToMenu() {
         this.state = 'MENU';
-        document.getElementById('pauseOverlay').classList.add('hidden');
-        document.getElementById('gameOverOverlay').classList.add('hidden');
-        document.getElementById('bananaChallengeModal').classList.add('hidden');
-        document.getElementById('mainMenuOverlay').classList.remove('hidden');
+        const hide = (id) => { const el = document.getElementById(id); if (el) el.classList.add('hidden'); };
+        const show = (id) => { const el = document.getElementById(id); if (el) el.classList.remove('hidden'); };
+        hide('pauseOverlay');
+        hide('gameOverOverlay');
+        hide('bananaChallengeModal');
+        show('mainMenuOverlay');
+        if (this.onStateChange) this.onStateChange('MENU');
     }
 
     toggleSound() {
         this.audio.init();
         const isMuted = this.audio.toggleMute();
         const btn = document.getElementById('btnSoundToggle');
-        const soundOnSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07"/></svg>';
-        const soundMutedSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4V5z"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>';
-        btn.innerHTML = isMuted ? `${soundMutedSvg} <span>Audio Muted</span>` : `${soundOnSvg} <span>Audio ON</span>`;
-        btn.classList.toggle('muted', isMuted);
+        if (btn) {
+            const soundOnSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07"/></svg>';
+            const soundMutedSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4V5z"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>';
+            btn.innerHTML = isMuted ? `${soundMutedSvg} <span>Audio Muted</span>` : `${soundOnSvg} <span>Audio ON</span>`;
+            btn.classList.toggle('muted', isMuted);
+        }
+        return isMuted;
     }
 
     triggerMegaBomb() {
@@ -1117,25 +1135,32 @@ class GameEngine {
         const accuracy = this.shotsFired > 0 ? ((this.shotsHit / this.shotsFired) * 100).toFixed(1) : 0;
         const survivalSecs = Math.floor(this.survivalTimer / 60);
 
-        // Populate Game Over Overlay
-        document.getElementById('goScore').textContent = this.score.toLocaleString();
-        document.getElementById('goLevel').textContent = this.level;
-        const goKillsEl = document.getElementById('goKills') || document.getElementById('goEnemies'); if (goKillsEl) goKillsEl.textContent = this.enemiesDestroyed;
-        document.getElementById('goBanana').textContent = this.bananaSolved;
-        document.getElementById('goAccuracy').textContent = `${accuracy}%`;
-        document.getElementById('goSurvival').textContent = `${survivalSecs}s`;
+        // Safe populate Game Over Overlay
+        const setText = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+        setText('goScore', this.score.toLocaleString());
+        setText('goLevel', this.level);
+        setText('goKills', this.enemiesDestroyed);
+        setText('goEnemies', this.enemiesDestroyed);
+        setText('goBanana', this.bananaSolved);
+        setText('goAccuracy', `${accuracy}%`);
+        setText('goSurvival', `${survivalSecs}s`);
 
-        document.getElementById('gameOverOverlay').classList.remove('hidden');
+        const goOverlay = document.getElementById('gameOverOverlay');
+        if (goOverlay) goOverlay.classList.remove('hidden');
 
-        // Transmit mission debrief via API (MySQL or LocalStorage telemetry)
-        window.API.submitScore({
-            score: this.score,
-            level: this.level,
-            enemiesDestroyed: this.enemiesDestroyed,
-            bananaSolved: this.bananaSolved,
-            accuracy: parseFloat(accuracy),
-            survivalTime: survivalSecs
-        });
+        if (this.onStateChange) this.onStateChange('GAME_OVER');
+
+        // Transmit mission debrief via API (SQLite or LocalStorage telemetry)
+        if (window.API && typeof window.API.submitScore === 'function') {
+            window.API.submitScore({
+                score: this.score,
+                level: this.level,
+                enemiesDestroyed: this.enemiesDestroyed,
+                bananaSolved: this.bananaSolved,
+                accuracy: parseFloat(accuracy),
+                survivalTime: survivalSecs
+            });
+        }
     }
 
     updateHUD() {
@@ -1222,12 +1247,19 @@ class GameEngine {
     }
 
     async openLeaderboard() {
+        if (this.onOpenLeaderboard) {
+            this.onOpenLeaderboard();
+            return;
+        }
         const modal = document.getElementById('leaderboardModal');
         const listEl = document.getElementById('leaderboardList');
+        if (!modal || !listEl) return;
         modal.classList.remove('hidden');
         listEl.innerHTML = '<div class="loader-spinner"></div> Fetching Sector Records...';
 
-        const scores = await window.API.getLeaderboard();
+        const scores = (window.API && typeof window.API.getLeaderboard === 'function')
+            ? await window.API.getLeaderboard()
+            : [];
         listEl.innerHTML = '';
 
         if (!scores || scores.length === 0) {
@@ -1255,43 +1287,61 @@ class GameEngine {
     }
 
     openProfileModal() {
-        const user = window.API.getCurrentUser();
+        if (this.onOpenProfile) {
+            this.onOpenProfile();
+            return;
+        }
+        const user = (window.API && typeof window.API.getCurrentUser === 'function')
+            ? window.API.getCurrentUser()
+            : { callsign: 'Cadet', username: 'guest', rank: 'Cadet', shipClass: 'Interceptor' };
         const modal = document.getElementById('profileModal');
+        if (!modal) return;
         modal.classList.remove('hidden');
 
-        document.getElementById('profCallsign').textContent = user.callsign;
-        document.getElementById('profUsername').textContent = `@${user.username}`;
-        document.getElementById('profRank').textContent = user.rank || 'Cadet';
-        document.getElementById('profShip').textContent = user.shipClass || 'Interceptor';
-        document.getElementById('profTotalScore').textContent = (user.totalScore || 0).toLocaleString();
-        document.getElementById('profGames').textContent = user.gamesPlayed || 0;
-        document.getElementById('profBanana').textContent = user.bananaSolved || 0;
-        document.getElementById('profAvatar').className = `pilot-avatar-large ${user.avatar || 'pilot_1'}`;
+        const setTxt = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+        setTxt('profCallsign', user.callsign);
+        setTxt('profUsername', `@${user.username}`);
+        setTxt('profRank', user.rank || 'Cadet');
+        setTxt('profShip', user.shipClass || 'Interceptor');
+        setTxt('profTotalScore', (user.totalScore || 0).toLocaleString());
+        setTxt('profGames', user.gamesPlayed || 0);
+        setTxt('profBanana', user.bananaSolved || 0);
+        const avEl = document.getElementById('profAvatar');
+        if (avEl) avEl.className = `pilot-avatar-large ${user.avatar || 'pilot_1'}`;
 
         const authBtn = document.getElementById('profAuthActionBtn');
-        if (user.isGuest) {
-            authBtn.textContent = 'Login / Commission Pilot';
-            authBtn.onclick = () => { window.location.href = 'login.html'; };
-        } else {
-            authBtn.textContent = 'Logout (Revert to Guest)';
-            authBtn.onclick = () => {
-                window.API.logout();
-                this.loadPilotProfile();
-                this.openProfileModal();
-            };
+        if (authBtn) {
+            if (user.isGuest) {
+                authBtn.textContent = 'Login / Commission Pilot';
+            } else {
+                authBtn.textContent = 'Logout (Revert to Guest)';
+                authBtn.onclick = () => {
+                    if (window.API) window.API.logout();
+                    this.loadPilotProfile();
+                    this.openProfileModal();
+                };
+            }
         }
     }
 }
 
-// Global initialization on DOMContentLoaded
-window.addEventListener('DOMContentLoaded', () => {
-    window.game = new GameEngine();
+// Expose GameEngine globally
+window.GameEngine = GameEngine;
 
-    // Modal Close Button handlers
-    document.querySelectorAll('.modal-close').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.target.closest('.modal-overlay').classList.add('hidden');
-        });
-    });
-});
+// Safe immediate auto-initialization
+const initGameInstance = () => {
+    if (!window.game && document.getElementById('gameCanvas')) {
+        try {
+            window.game = new GameEngine();
+        } catch (e) {
+            console.warn('[GAME ENGINE] Auto-init deferred:', e);
+        }
+    }
+};
+
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    initGameInstance();
+} else {
+    window.addEventListener('DOMContentLoaded', initGameInstance);
+}
 
