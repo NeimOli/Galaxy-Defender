@@ -58,17 +58,20 @@ export default function LoginModal({ isOpen = true, onClose, onSuccess, onSucces
 
                 <form onSubmit={handleSubmit} style={{ marginTop: '8px' }}>
                     <div className="form-group">
-                        <label className="form-label" htmlFor="loginUsername">Pilot Callsign / Username</label>
+                        <label className="form-label" htmlFor="loginUsername">Pilot Username or Callsign</label>
                         <input
                             id="loginUsername"
                             className="form-input"
                             type="text"
-                            placeholder="e.g. shepard or fox"
+                            placeholder="e.g. your username or callsign"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
                             required
                             autoFocus
                         />
+                        <div style={{ fontSize: '11px', color: 'rgba(0, 240, 255, 0.65)', marginTop: '4px' }}>
+                            You can enter either your Username or your Callsign
+                        </div>
                     </div>
 
                     <div className="form-group">

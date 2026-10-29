@@ -224,17 +224,24 @@ app.get('/api/banana', async (req, res) => {
 app.post('/api/login', (req, res) => {
     const { username, password } = req.body;
     if (!username || !password) {
-        return res.status(400).json({ status: 'error', message: 'Username and password required.' });
+        return res.status(400).json({ status: 'error', message: 'Username / Callsign and password required.' });
     }
 
-    const user = db.prepare('SELECT * FROM users WHERE username = ?').get(username);
+    const cleanInput = String(username).trim();
+    // Allow login by either username OR callsign, case-insensitive
+    const user = db.prepare(`
+        SELECT * FROM users
+        WHERE LOWER(username) = LOWER(?) OR LOWER(callsign) = LOWER(?)
+    `).get(cleanInput, cleanInput);
+
     if (!user) {
         return res.status(401).json({ status: 'error', message: 'Invalid callsign or security passcode.' });
     }
 
-    // Verify hash (supports sha256 or plaintext password)
+    // Verify hash (supports sha256 or plaintext password, trimmed or untrimmed)
     const hash = crypto.createHash('sha256').update(password).digest('hex');
-    if (user.password_hash !== hash && user.password_hash !== password) {
+    const hashTrimmed = crypto.createHash('sha256').update(String(password).trim()).digest('hex');
+    if (user.password_hash !== hash && user.password_hash !== hashTrimmed && user.password_hash !== password) {
         return res.status(401).json({ status: 'error', message: 'Invalid callsign or security passcode.' });
     }
 
