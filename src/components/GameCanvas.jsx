@@ -1,4 +1,4 @@
-/**
+﻿/**
  * GameCanvas.jsx — Canvas Game Engine Wrapper
  * Bridges the vanilla JS GameEngine with React via useRef + useEffect.
  * Theme: Event-Driven Programming (game loop, custom events, callbacks)
@@ -19,18 +19,10 @@ export default function GameCanvas({
 
   // Patch the game engine to use React callbacks instead of direct DOM writes
   const patchEngine = useCallback((engine) => {
-    // Override updateHUD to fire React state updates
-    const origUpdateHUD = engine.updateHUD.bind(engine);
-    engine.updateHUD = function () {
-      origUpdateHUD();
-      onHudUpdate({
-        shield: engine.player.shield,
-        maxShield: engine.player.maxShield,
-        lives: engine.player.lives,
-        bombs: engine.player.megaBombs,
-        score: engine.score,
-        level: engine.level,
-      });
+    // Wire React HUD callback directly into game engine
+    // game.js updateHUD() will call engine.onHudUpdate({...}) on every sync
+    engine.onHudUpdate = function (data) {
+      onHudUpdate(data);
       if (engine.boss) {
         onBossHealth({ hp: engine.boss.hp, maxHp: engine.boss.maxHp, name: engine.boss.name });
       } else {

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * ====================================================================
  * Galaxy Defender — Core Game Engine
  * Themes Demonstrated:
@@ -465,6 +465,9 @@ class GameEngine {
             shoot: false
         };
 
+        // React HUD callback — patched by GameCanvas.jsx after scripts load
+        this.onHudUpdate = null;
+
         // Initialize systems
         this.initEventListeners();
         this.initHUD();
@@ -826,10 +829,20 @@ class GameEngine {
     }
 
     // -------------------------------------------------------------------------
+    // Per-frame HUD telemetry sync to React (every 3 frames = ~20fps refresh)
+    // -------------------------------------------------------------------------
+    syncHUD() {
+        if (!this.player) return;
+        this._hudTick = (this._hudTick || 0) + 1;
+        if (this._hudTick % 3 === 0) this.updateHUD();
+    }
+
+    // -------------------------------------------------------------------------
     // Main Game Loop (60 FPS requestAnimationFrame)
     // -------------------------------------------------------------------------
     loop() {
         this.update();
+        this.syncHUD();   // sync shield/hull/bombs to React every ~3 frames
         this.render();
         requestAnimationFrame(() => this.loop());
     }
@@ -1230,7 +1243,19 @@ class GameEngine {
     }
 
     updateHUD() {
-        // Shield Bar
+        // ── React HUD bridge ── fire callback if GameCanvas.jsx has patched it
+        if (typeof this.onHudUpdate === 'function' && this.player) {
+            this.onHudUpdate({
+                shield:    this.player.shield,
+                maxShield: this.player.maxShield,
+                lives:     this.player.lives,
+                bombs:     this.player.megaBombs,
+                score:     this.score,
+                level:     this.level,
+            });
+        }
+
+        // Shield Bar (legacy DOM fallback — kept for compatibility)
         const shieldBar = document.getElementById('hudShieldFill');
         if (shieldBar) {
             const shieldPct = Math.max(0, (this.player.shield / this.player.maxShield) * 100);
