@@ -84,12 +84,22 @@ export default function App() {
   const handleBananaSolve = () => {
     if (window.game) {
       window.game.bananaSolved = (window.game.bananaSolved || 0) + 1;
-      window.game.score += 200;
-      window.game.player.shield = Math.min(window.game.player.shield + 30, window.game.player.maxShield);
-      window.game.player.megaBombs = Math.min(window.game.player.megaBombs + 1, 5);
-      window.game.particles?.addFloatingText('BANANA SOLVED! +200 PTS', window.game.width / 2, window.game.height * 0.3, '#ffb703');
+      window.game.score += 1500;
+      if (window.game.player) {
+        window.game.player.shield = window.game.player.maxShield || 100;
+        window.game.player.megaBombs = Math.min((window.game.player.megaBombs || 0) + 1, 5);
+      }
+      window.game.particles?.addFloatingText('BANANA API SOLVED! +1,500 PTS // SHIELD RESTORED!', window.game.width / 2, window.game.height * 0.3, '#ffb703');
       window.game.audio?.playPowerUp();
       window.game.updateHUD();
+    }
+    // Update logged-in user career telemetry in SQLite/localStorage
+    const currentUser = API.getCurrentUser();
+    if (currentUser && !currentUser.isGuest) {
+      currentUser.bananaSolved = (currentUser.bananaSolved || 0) + 1;
+      currentUser.totalScore = (currentUser.totalScore || 0) + 1500;
+      API.setCurrentUser(currentUser);
+      setUser({ ...currentUser });
     }
   };
 
@@ -117,8 +127,13 @@ export default function App() {
   // ── Keep user in sync if API session changes externally ──────────────────
   useEffect(() => {
     const sync = () => setUser(API.getCurrentUser());
+    const openBanana = () => setModal('banana');
     window.addEventListener('virtual_identity_changed', sync);
-    return () => window.removeEventListener('virtual_identity_changed', sync);
+    window.addEventListener('open_banana_challenge', openBanana);
+    return () => {
+      window.removeEventListener('virtual_identity_changed', sync);
+      window.removeEventListener('open_banana_challenge', openBanana);
+    };
   }, []);
 
   // ── Derive overlay state from gameState ───────────────────────────────────
@@ -182,6 +197,7 @@ export default function App() {
             onStateChange={handleStateChange}
             onHudUpdate={handleHudUpdate}
             onBossHealth={handleBossHealth}
+            onOpenBanana={() => setModal('banana')}
             soundMuted={soundMuted}
             user={user}
           />

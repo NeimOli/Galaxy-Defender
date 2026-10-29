@@ -1057,7 +1057,12 @@ class GameEngine {
     // Interoperability: Marc Conrad Banana API Challenge System
     // -------------------------------------------------------------------------
     async triggerBananaChallenge(sourceReason = 'manual') {
+        this.state = 'BANANA_CHALLENGE';
+        window.dispatchEvent(new CustomEvent('open_banana_challenge'));
+
         const modal = document.getElementById('bananaChallengeModal');
+        if (!modal) return; // Managed by React in App.jsx
+
         const imgEl = document.getElementById('bananaPuzzleImg');
         const statusEl = document.getElementById('bananaPuzzleStatus');
         const keypadContainer = document.getElementById('bananaKeypad');

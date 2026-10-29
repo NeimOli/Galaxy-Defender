@@ -10,6 +10,7 @@ export default function GameCanvas({
   onStateChange,
   onHudUpdate,
   onBossHealth,
+  onOpenBanana,
   soundMuted,
   user,
 }) {
@@ -37,6 +38,13 @@ export default function GameCanvas({
       }
     };
 
+    // Override banana challenge to open React modal
+    engine.triggerBananaChallenge = function () {
+      engine.state = 'BANANA_CHALLENGE';
+      if (onOpenBanana) onOpenBanana();
+      else window.dispatchEvent(new CustomEvent('open_banana_challenge'));
+    };
+
     // Override state transitions to notify React
     const origStart = engine.startGame.bind(engine);
     engine.startGame = function () {
@@ -61,7 +69,7 @@ export default function GameCanvas({
       origQuit();
       onStateChange('MENU');
     };
-  }, [onHudUpdate, onBossHealth, onStateChange]);
+  }, [onHudUpdate, onBossHealth, onStateChange, onOpenBanana]);
 
   // Initialize the game engine once the canvas mounts
   useEffect(() => {
