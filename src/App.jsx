@@ -119,6 +119,14 @@ export default function App() {
       window.game.audio?.playPowerUp();
       window.game.updateHUD();
     }
+    // Direct immediate React HUD state update to ensure TelemetryHUD displays rewards instantly
+    setHud(prev => ({
+      ...prev,
+      shield: 100,
+      bombs: Math.min((prev.bombs ?? 2) + 1, 5),
+      score: (prev.score || 0) + 1500
+    }));
+
     // Update logged-in user career telemetry in SQLite/localStorage
     const currentUser = API.getCurrentUser();
     if (currentUser && !currentUser.isGuest) {
@@ -140,6 +148,7 @@ export default function App() {
     }
     if (window.game) {
       window.game.startGame();
+      window.game.updateHUD();
       setGameState('PLAYING');
     }
   };
@@ -158,6 +167,12 @@ export default function App() {
     const syncAudio = (e) => {
       if (e.detail && typeof e.detail.isMuted === 'boolean') {
         setSoundMuted(e.detail.isMuted);
+      }
+    };
+
+    const handleGalaxyHud = (e) => {
+      if (e.detail) {
+        handleHudUpdate(e.detail);
       }
     };
 
@@ -181,15 +196,17 @@ export default function App() {
     window.addEventListener('virtual_identity_changed', sync);
     window.addEventListener('open_banana_challenge', openBanana);
     window.addEventListener('audio_mute_changed', syncAudio);
+    window.addEventListener('galaxy_hud_update', handleGalaxyHud);
     window.addEventListener('keydown', handleGlobalKey);
 
     return () => {
       window.removeEventListener('virtual_identity_changed', sync);
       window.removeEventListener('open_banana_challenge', openBanana);
       window.removeEventListener('audio_mute_changed', syncAudio);
+      window.removeEventListener('galaxy_hud_update', handleGalaxyHud);
       window.removeEventListener('keydown', handleGlobalKey);
     };
-  }, []);
+  }, [handleHudUpdate]);
 
   // ── Derive overlay state from gameState ───────────────────────────────────
   const showMainMenu = gameState === 'MENU';

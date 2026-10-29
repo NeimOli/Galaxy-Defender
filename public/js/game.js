@@ -1114,12 +1114,14 @@ class GameEngine {
                 if (p.type === 'shield') {
                     this.player.rechargeShield(50);
                     this.particles.addFloatingText('SHIELDS RESTORED!', p.x, p.y, '#00e5ff');
+                    this.updateHUD();
                 } else if (p.type === 'weapon') {
                     const upgraded = this.player.upgradeWeapon();
                     this.particles.addFloatingText(upgraded ? 'WEAPON OVERCHARGED!' : 'MAX FIREPOWER!', p.x, p.y, '#ff007f');
                 } else if (p.type === 'bomb') {
                     this.player.addBomb();
                     this.particles.addFloatingText('+1 BANANA MEGA BOMB!', p.x, p.y, '#ffaa00');
+                    this.updateHUD();
                 } else if (p.type === 'banana') {
                     this.triggerBananaChallenge('drop');
                 }
@@ -1243,16 +1245,25 @@ class GameEngine {
     }
 
     updateHUD() {
-        // ── React HUD bridge ── fire callback if GameCanvas.jsx has patched it
-        if (typeof this.onHudUpdate === 'function' && this.player) {
-            this.onHudUpdate({
-                shield:    this.player.shield,
-                maxShield: this.player.maxShield,
-                lives:     this.player.lives,
-                bombs:     this.player.megaBombs,
-                score:     this.score,
-                level:     this.level,
-            });
+        if (!this.player) return;
+
+        const hudData = {
+            shield:    Math.round(this.player.shield),
+            maxShield: this.player.maxShield || 100,
+            lives:     this.player.lives,
+            bombs:     this.player.megaBombs,
+            score:     this.score || 0,
+            level:     this.level || 1,
+        };
+
+        // 1. Guaranteed real-time decoupled React HUD sync via CustomEvent
+        try {
+            window.dispatchEvent(new CustomEvent('galaxy_hud_update', { detail: hudData }));
+        } catch (e) {}
+
+        // 2. Direct callback bridge
+        if (typeof this.onHudUpdate === 'function') {
+            try { this.onHudUpdate(hudData); } catch (e) {}
         }
 
         // Shield Bar (legacy DOM fallback — kept for compatibility)

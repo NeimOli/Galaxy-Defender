@@ -75,7 +75,7 @@ export default function GameCanvas({
         return;
       }
       const s = document.createElement('script');
-      s.src = src;
+      s.src = `${src}?t=${Date.now()}`;
       s.setAttribute('data-game-src', src);
       s.onload = resolve;
       s.onerror = reject;
