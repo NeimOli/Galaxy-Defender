@@ -46,6 +46,7 @@ export default function App() {
   // ── UI Controls ───────────────────────────────────────────────────────────
   const [soundMuted, setSoundMuted] = useState(false);
   const [modal, setModal] = useState(null); // 'banana' | 'leaderboard' | 'profile' | 'login' | 'register' | 'tests'
+  const [bananaSource, setBananaSource] = useState('game'); // 'game' | 'menu'
 
   // ── Callbacks from game engine ────────────────────────────────────────────
   const lastHudRef = useRef({});
@@ -173,7 +174,7 @@ export default function App() {
   // ── Keep user in sync if API session changes externally & global shortcuts ──
   useEffect(() => {
     const sync = () => setUser(API.getCurrentUser());
-    const openBanana = () => setModal('banana');
+    const openBanana = () => { setBananaSource('menu'); setModal('banana'); };
 
     const syncAudio = (e) => {
       if (e.detail && typeof e.detail.isMuted === 'boolean') {
@@ -212,7 +213,8 @@ export default function App() {
     };
 
     window.addEventListener('virtual_identity_changed', sync);
-    window.addEventListener('open_banana_challenge', openBanana);
+    const openBananaInGame = () => { setBananaSource('game'); setModal('banana'); };
+    window.addEventListener('open_banana_challenge', openBananaInGame);
     window.addEventListener('audio_mute_changed', syncAudio);
     window.addEventListener('galaxy_hud_update', handleGalaxyHud);
     window.addEventListener('galaxy_game_over', handleGalaxyGameOver);
@@ -220,7 +222,7 @@ export default function App() {
 
     return () => {
       window.removeEventListener('virtual_identity_changed', sync);
-      window.removeEventListener('open_banana_challenge', openBanana);
+      window.removeEventListener('open_banana_challenge', openBananaInGame);
       window.removeEventListener('audio_mute_changed', syncAudio);
       window.removeEventListener('galaxy_hud_update', handleGalaxyHud);
       window.removeEventListener('galaxy_game_over', handleGalaxyGameOver);
@@ -243,7 +245,7 @@ export default function App() {
         soundMuted={soundMuted}
         gameState={gameState}
         onSoundToggle={handleSoundToggle}
-        onOpenBanana={() => setModal('banana')}
+        onOpenBanana={() => { setBananaSource('menu'); setModal('banana'); }}
         onOpenLeaderboard={() => setModal('leaderboard')}
         onOpenProfile={() => setModal('profile')}
         onOpenTests={() => setModal('tests')}
@@ -299,7 +301,7 @@ export default function App() {
             onStateChange={handleStateChange}
             onHudUpdate={handleHudUpdate}
             onBossHealth={handleBossHealth}
-            onOpenBanana={() => setModal('banana')}
+            onOpenBanana={() => { setBananaSource('game'); setModal('banana'); }}
             soundMuted={soundMuted}
             user={user}
           />
@@ -478,6 +480,7 @@ export default function App() {
       {/* ── Modals ─────────────────────────────────────────────────────── */}
       {modal === 'banana' && (
         <BananaModal
+          showCloseButton={bananaSource === 'menu'}
           onClose={() => {
             setModal(null);
             if (window.game?.state === 'BANANA_CHALLENGE') {

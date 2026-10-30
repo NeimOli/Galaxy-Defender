@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { API } from '../services/api';
 
-export default function BananaModal({ isOpen = true, onClose, onSolve, onSolveSuccess }) {
+export default function BananaModal({ isOpen = true, onClose, onSolve, onSolveSuccess, showCloseButton = false }) {
     const handleSolveSuccess = onSolve || onSolveSuccess || (() => {});
     const [loading, setLoading] = useState(true);
     const [puzzleData, setPuzzleData] = useState(null);
@@ -67,6 +67,7 @@ export default function BananaModal({ isOpen = true, onClose, onSolve, onSolveSu
             className="modal-overlay"
             role="dialog"
             aria-modal="true"
+            onClick={(e) => showCloseButton && e.target === e.currentTarget && onClose()}
         >
             <div className="modal-content" style={{ maxWidth: '520px' }}>
 
@@ -92,6 +93,9 @@ export default function BananaModal({ isOpen = true, onClose, onSolve, onSolveSu
                             </div>
                         </div>
                     </div>
+                    {showCloseButton && (
+                        <button className="modal-close" onClick={onClose} aria-label="Close modal">&times;</button>
+                    )}
                 </div>
 
                 <div className="banana-challenge-body" style={{ marginTop: '10px' }}>
