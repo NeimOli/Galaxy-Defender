@@ -1,7 +1,7 @@
 # References & Academic Citations
 
 **Project Title:** Galaxy Defender — Space Shooter Game  
-**Author:** Sagar Thapa  
+**Author:** NeimOli  
 **Course:** Software for Enterprise  
 
 ---
