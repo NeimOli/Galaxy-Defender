@@ -49,8 +49,11 @@ export default function BananaModal({ isOpen = true, onClose, onSolve, onSolveSu
                 onClose();
             }, 1400);
         } else {
-            setStatusText(`INCORRECT: Value '${digit}' rejected. Recalculate the visual equation.`);
+            setStatusText('INCORRECT — No bonus awarded.');
             setStatusColor('#ff3366');
+            setTimeout(() => {
+                onClose();
+            }, 1200);
         }
     };
 
@@ -64,7 +67,6 @@ export default function BananaModal({ isOpen = true, onClose, onSolve, onSolveSu
             className="modal-overlay"
             role="dialog"
             aria-modal="true"
-            onClick={(e) => e.target === e.currentTarget && onClose()}
         >
             <div className="modal-content" style={{ maxWidth: '520px' }}>
 
@@ -90,15 +92,9 @@ export default function BananaModal({ isOpen = true, onClose, onSolve, onSolveSu
                             </div>
                         </div>
                     </div>
-                    <button className="modal-close" onClick={onClose} aria-label="Close modal">&times;</button>
                 </div>
 
                 <div className="banana-challenge-body" style={{ marginTop: '10px' }}>
-                    <p style={{ fontSize: '0.8rem', color: 'rgba(255, 255, 255, 0.65)', marginBottom: '12px', lineHeight: 1.5, textAlign: 'center' }}>
-                        This module demonstrates <strong>Interoperability</strong> by integrating the external <strong>Dr. Marc Conrad Banana API</strong>.
-                        Decode the arithmetic equation below to earn <strong>+1,500 Score</strong>, max shields, and +1 Mega Bomb.
-                    </p>
-
                     {/* ── Puzzle Image Wrapper ── */}
                     <div className="banana-puzzle-wrapper" style={{
                         width: '100%',
