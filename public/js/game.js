@@ -443,6 +443,7 @@ class GameEngine {
         this.shotsFired = 0;
         this.shotsHit = 0;
         this.bananaSolved = 0;
+        this.bananaChallengeUsed = false;
         this.survivalTimer = 0;
         this.combo = 0;
         this.comboTimer = 0;
@@ -455,6 +456,7 @@ class GameEngine {
 
         // Active Banana API Challenge State
         this.currentBananaPuzzle = null;
+        this.bananaChallengeUsed = false; // Only one banana bonus challenge allowed per game run
 
         // Input Controller State
         this.keys = {
@@ -981,8 +983,12 @@ class GameEngine {
         this.audio.playExplosion(true);
         this.audio.playVictory();
 
-        // Drop multiple powerups and Banana Core
-        this.powerUps.push(new PowerUp(this.boss.x + this.boss.width / 2, this.boss.y + 40, 'banana'));
+        // Drop multiple powerups (only drop Banana Core if not yet encountered this run)
+        if (!this.bananaChallengeUsed) {
+            this.powerUps.push(new PowerUp(this.boss.x + this.boss.width / 2, this.boss.y + 40, 'banana'));
+        } else {
+            this.powerUps.push(new PowerUp(this.boss.x + this.boss.width / 2, this.boss.y + 40, 'bomb'));
+        }
         this.powerUps.push(new PowerUp(this.boss.x + 30, this.boss.y + 60, 'weapon'));
         this.powerUps.push(new PowerUp(this.boss.x + this.boss.width - 30, this.boss.y + 60, 'shield'));
 
@@ -991,13 +997,6 @@ class GameEngine {
         this.waveTimer = 0;
 
         this.particles.addFloatingText(`SECTOR CLEARED! ADVANCING TO SECTOR ${this.level}`, this.width / 2, this.height / 2, '#00ffcc');
-
-        // Automatically trigger Interoperability Banana Quantum Gate
-        setTimeout(() => {
-            if (this.state === 'PLAYING') {
-                this.triggerBananaChallenge('sector_clear');
-            }
-        }, 1200);
     }
 
     checkCollisions() {
@@ -1033,13 +1032,17 @@ class GameEngine {
                         this.score += comboBonus;
                         this.particles.addFloatingText(`+${comboBonus}`, e.x + e.width / 2, e.y, '#00ffcc');
 
-                        // Chance to drop power-up
+                        // Chance to drop power-up (banana core only drops once per run)
                         if (Math.random() < 0.22) {
                             const roll = Math.random();
                             let pType = 'shield';
-                            if (roll < 0.28) pType = 'banana';
-                            else if (roll < 0.55) pType = 'weapon';
-                            else if (roll < 0.80) pType = 'bomb';
+                            if (!this.bananaChallengeUsed && roll < 0.28) {
+                                pType = 'banana';
+                            } else if (roll < 0.55) {
+                                pType = 'weapon';
+                            } else if (roll < 0.80) {
+                                pType = 'bomb';
+                            }
                             this.powerUps.push(new PowerUp(e.x + e.width / 2, e.y + e.height / 2, pType));
                         }
                     }
@@ -1123,7 +1126,14 @@ class GameEngine {
                     this.particles.addFloatingText('+1 BANANA MEGA BOMB!', p.x, p.y, '#ffaa00');
                     this.updateHUD();
                 } else if (p.type === 'banana') {
-                    this.triggerBananaChallenge('drop');
+                    if (!this.bananaChallengeUsed) {
+                        this.bananaChallengeUsed = true;
+                        this.triggerBananaChallenge('drop');
+                    } else {
+                        this.score += 250;
+                        this.particles.addFloatingText('+250 PTS', p.x, p.y, '#ffb703');
+                        this.updateHUD();
+                    }
                 }
             }
         }
@@ -1133,6 +1143,9 @@ class GameEngine {
     // Interoperability: Marc Conrad Banana API Challenge System
     // -------------------------------------------------------------------------
     async triggerBananaChallenge(sourceReason = 'manual') {
+        if (sourceReason !== 'manual') {
+            this.bananaChallengeUsed = true;
+        }
         this.state = 'BANANA_CHALLENGE';
         window.dispatchEvent(new CustomEvent('open_banana_challenge'));
 

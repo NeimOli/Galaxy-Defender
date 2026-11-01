@@ -35,8 +35,11 @@ export default function GameCanvas({
       onStateChange(state, stats);
     };
 
-    // Override banana challenge to open React modal
-    engine.triggerBananaChallenge = function () {
+    // Override banana challenge to open React modal (one-time per game run)
+    engine.triggerBananaChallenge = function (sourceReason = 'drop') {
+      if (sourceReason !== 'manual') {
+        engine.bananaChallengeUsed = true;
+      }
       engine.state = 'BANANA_CHALLENGE';
       if (onOpenBanana) onOpenBanana();
       else window.dispatchEvent(new CustomEvent('open_banana_challenge'));

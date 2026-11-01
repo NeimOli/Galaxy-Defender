@@ -88,6 +88,7 @@ Interoperability is demonstrated through an external RESTful web service integra
 - **In-Game Combat Role:**
   The Banana API serves as the **Quantum Decryption Matrix**. When triggered during combat:
   - The game pauses and displays the visual mathematical cipher.
+  - **One-Time Bonus Per Run:** The Banana Challenge is triggered strictly once per game session when the pilot collects a Banana Core in space. Defeating the boss does not automatically pop up the challenge, preventing redundant triggers.
   - **No Dismiss Button:** During combat, the modal cannot be closed manually without answering.
   - **Correct Answer:** Awards **+1,500 Score**, recharges Quantum Shield to 100%, and grants **+1 Mega Bomb**.
   - **Incorrect Answer:** Displays `INCORRECT — No bonus awarded.` in red, auto-closes after 1.2s, and resumes combat without bonuses or penalties.
