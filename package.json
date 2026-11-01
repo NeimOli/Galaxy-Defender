@@ -9,7 +9,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "server": "node server.js",
-    "start": "node server.js"
+    "start": "node server.js",
+    "db:view": "node view_db.cjs"
   },
   "dependencies": {
     "@vitejs/plugin-react": "^6.1.2",
