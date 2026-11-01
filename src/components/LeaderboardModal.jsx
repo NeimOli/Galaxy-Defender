@@ -335,7 +335,7 @@ export default function LeaderboardModal({
 
 
                         {/* ── Top 3 Aces Podium Showcase with Detailed Telemetry ── */}
-                        {!loading && filteredList.length > 0 && (
+                        {!loading && tab === 'global' && filteredList.length > 0 && (
                             <div className="top-three-podium">
                                 {filteredList.slice(0, 3).map((ace, i) => {
                                     const place = i + 1;
