@@ -352,3 +352,27 @@
   }
 }
 
+
+
+/* ── Top 3 Podium Showcase ── */
+.top-three-podium {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  padding: 12px 20px 16px;
+}
+
+.podium-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.podium-card:hover {
+  transform: translateY(-2px);
+}
+
+@media (max-width: 860px) {
+  .top-three-podium {
+    grid-template-columns: 1fr;
+    padding: 10px 14px;
+  }
+}

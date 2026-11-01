@@ -333,6 +333,166 @@ export default function LeaderboardModal({
                             </div>
                         </div>
 
+
+                        {/* ── Top 3 Aces Podium Showcase with Detailed Telemetry ── */}
+                        {!loading && filteredList.length > 0 && (
+                            <div className="top-three-podium">
+                                {filteredList.slice(0, 3).map((ace, i) => {
+                                    const place = i + 1;
+                                    const config = [
+                                        {
+                                            title: '1ST PLACE // CHAMPION',
+                                            color: '#ffd700',
+                                            bg: 'linear-gradient(135deg, rgba(255, 215, 0, 0.14) 0%, rgba(18, 14, 4, 0.92) 100%)',
+                                            border: '1.5px solid rgba(255, 215, 0, 0.65)',
+                                            badgeBg: '#ffd700',
+                                            badgeColor: '#050814'
+                                        },
+                                        {
+                                            title: '2ND PLACE // VANGUARD',
+                                            color: '#e2e8f0',
+                                            bg: 'linear-gradient(135deg, rgba(226, 232, 240, 0.12) 0%, rgba(12, 16, 28, 0.92) 100%)',
+                                            border: '1.5px solid rgba(226, 232, 240, 0.55)',
+                                            badgeBg: '#e2e8f0',
+                                            badgeColor: '#050814'
+                                        },
+                                        {
+                                            title: '3RD PLACE // GUARDIAN',
+                                            color: '#cd7f32',
+                                            bg: 'linear-gradient(135deg, rgba(205, 127, 50, 0.12) 0%, rgba(20, 12, 8, 0.92) 100%)',
+                                            border: '1.5px solid rgba(205, 127, 50, 0.55)',
+                                            badgeBg: '#cd7f32',
+                                            badgeColor: '#050814'
+                                        }
+                                    ][i];
+
+                                    const isCurrent = currentUser?.id && (
+                                        Number(ace.user_id) === Number(currentUser.id) ||
+                                        (currentUser.username && ace.username && ace.username.toLowerCase() === currentUser.username.toLowerCase()) ||
+                                        (currentUser.callsign && ace.pilot_name && ace.pilot_name.toLowerCase() === currentUser.callsign.toLowerCase())
+                                    );
+
+                                    return (
+                                        <div
+                                            key={ace.id || i}
+                                            className={`podium-card place-${place} ${isCurrent ? 'my-flight-row' : ''}`}
+                                            style={{
+                                                background: config.bg,
+                                                border: config.border,
+                                                borderRadius: '10px',
+                                                padding: '14px',
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                justifyContent: 'space-between',
+                                                boxShadow: `0 8px 24px rgba(0, 0, 0, 0.6), 0 0 16px ${config.color}25`,
+                                                position: 'relative'
+                                            }}
+                                        >
+                                            <div>
+                                                {/* Header badge */}
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                                                    <span style={{
+                                                        background: config.badgeBg,
+                                                        color: config.badgeColor,
+                                                        padding: '3px 8px',
+                                                        borderRadius: '4px',
+                                                        fontSize: '0.72rem',
+                                                        fontFamily: "'Orbitron', monospace",
+                                                        fontWeight: 800,
+                                                        display: 'inline-flex',
+                                                        alignItems: 'center',
+                                                        gap: '4px',
+                                                        letterSpacing: '0.04em'
+                                                    }}>
+                                                        {medalIcon(place)} {config.title}
+                                                    </span>
+                                                    {isCurrent && <span className="you-pill">YOU</span>}
+                                                </div>
+
+                                                {/* Pilot identity row */}
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
+                                                    <div style={{
+                                                        width: '38px', height: '38px',
+                                                        borderRadius: '50%',
+                                                        border: `2px solid ${config.color}`,
+                                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                        background: 'rgba(0, 0, 0, 0.5)'
+                                                    }}>
+                                                        <svg width="20" height="20" viewBox="0 0 24 24" fill={config.color}>
+                                                            <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+                                                            <circle cx="12" cy="7" r="4"/>
+                                                        </svg>
+                                                    </div>
+                                                    <div>
+                                                        <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#fff', letterSpacing: '0.02em' }}>
+                                                            {ace.pilot_name}
+                                                        </div>
+                                                        <div style={{ fontSize: '0.72rem', color: config.color, fontWeight: 700, display: 'flex', gap: '6px' }}>
+                                                            <span>{ace.rank || 'Cadet'}</span>
+                                                            <span style={{ color: 'rgba(255,255,255,0.4)' }}>//</span>
+                                                            <span style={{ color: '#fff' }}>{ace.ship_class || 'Interceptor'}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                {/* Combat Score Banner */}
+                                                <div style={{
+                                                    background: 'rgba(0, 0, 0, 0.45)',
+                                                    padding: '10px 12px',
+                                                    borderRadius: '6px',
+                                                    border: `1px solid ${config.color}33`,
+                                                    marginBottom: '12px',
+                                                    textAlign: 'center'
+                                                }}>
+                                                    <div style={{ fontSize: '0.65rem', textTransform: 'uppercase', color: 'rgba(255, 255, 255, 0.5)', letterSpacing: '0.08em' }}>
+                                                        Combat Score
+                                                    </div>
+                                                    <div style={{
+                                                        fontSize: '1.45rem',
+                                                        fontFamily: "'Orbitron', monospace",
+                                                        fontWeight: 900,
+                                                        color: config.color,
+                                                        textShadow: `0 0 12px ${config.color}55`
+                                                    }}>
+                                                        {Number(ace.score || 0).toLocaleString()}
+                                                    </div>
+                                                </div>
+
+                                                {/* Detailed Metrics Grid */}
+                                                <div style={{
+                                                    display: 'grid',
+                                                    gridTemplateColumns: 'repeat(2, 1fr)',
+                                                    gap: '6px',
+                                                    fontSize: '0.72rem'
+                                                }}>
+                                                    <div style={{ background: 'rgba(255, 255, 255, 0.03)', padding: '6px 8px', borderRadius: '4px', border: '1px solid rgba(255, 255, 255, 0.06)' }}>
+                                                        <div style={{ color: 'rgba(255, 255, 255, 0.4)', fontSize: '0.62rem' }}>SECTOR REACHED</div>
+                                                        <div style={{ color: '#00f0ff', fontWeight: 700, fontSize: '0.85rem' }}>Sector {ace.level_reached}</div>
+                                                    </div>
+                                                    <div style={{ background: 'rgba(255, 255, 255, 0.03)', padding: '6px 8px', borderRadius: '4px', border: '1px solid rgba(255, 255, 255, 0.06)' }}>
+                                                        <div style={{ color: 'rgba(255, 255, 255, 0.4)', fontSize: '0.62rem' }}>HOSTILES DOWN</div>
+                                                        <div style={{ color: '#ff3366', fontWeight: 700, fontSize: '0.85rem' }}>{ace.enemies_destroyed} Kills</div>
+                                                    </div>
+                                                    <div style={{ background: 'rgba(255, 255, 255, 0.03)', padding: '6px 8px', borderRadius: '4px', border: '1px solid rgba(255, 255, 255, 0.06)' }}>
+                                                        <div style={{ color: 'rgba(255, 255, 255, 0.4)', fontSize: '0.62rem' }}>BANANA CIPHERS</div>
+                                                        <div style={{ color: '#ffb703', fontWeight: 700, fontSize: '0.85rem' }}>{ace.banana_puzzles_completed || 0} Solved</div>
+                                                    </div>
+                                                    <div style={{ background: 'rgba(255, 255, 255, 0.03)', padding: '6px 8px', borderRadius: '4px', border: '1px solid rgba(255, 255, 255, 0.06)' }}>
+                                                        <div style={{ color: 'rgba(255, 255, 255, 0.4)', fontSize: '0.62rem' }}>ACCURACY</div>
+                                                        <div style={{ color: '#00f59b', fontWeight: 700, fontSize: '0.85rem' }}>{ace.accuracy_percentage || 0}%</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div style={{ fontSize: '0.65rem', color: 'rgba(255, 255, 255, 0.4)', marginTop: '10px', textAlign: 'right' }}>
+                                                {ace.recorded_at ? new Date(ace.recorded_at).toLocaleDateString() : 'Active Fleet'}
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
+
                         {/* ── Table ── */}
                         <div className="table-responsive-container">
                             {loading ? (
