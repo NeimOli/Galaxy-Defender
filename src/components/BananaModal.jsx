@@ -69,7 +69,7 @@ export default function BananaModal({ isOpen = true, onClose, onSolve, onSolveSu
             aria-modal="true"
             onClick={(e) => showCloseButton && e.target === e.currentTarget && onClose()}
         >
-            <div className="modal-content" style={{ maxWidth: '520px' }}>
+            <div className="modal-content" style={{ maxWidth: 'min(94vw, 520px)', maxHeight: '90vh', overflowY: 'auto' }}>
 
                 {/* ── Header ── */}
                 <div className="modal-header">

@@ -88,7 +88,7 @@ export default function SectorsModal({
 
     return (
         <div className="modal-overlay" role="dialog" aria-modal="true" onClick={(e) => e.target === e.currentTarget && onClose()}>
-            <div className="modal-content sectors-modal-content" style={{ maxWidth: '820px', maxHeight: '90vh', overflowY: 'auto' }}>
+            <div className="modal-content sectors-modal-content" style={{ maxWidth: 'min(94vw, 840px)', maxHeight: '88vh', overflowY: 'auto' }}>
                 {/* ── Modal Header ── */}
                 <div className="modal-header">
                     <div className="modal-title" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -154,7 +154,7 @@ export default function SectorsModal({
                 {/* ── Sector Cards Grid ── */}
                 <div className="sectors-grid" style={{
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
                     gap: '12px',
                     marginBottom: '16px'
                 }}>
@@ -284,3 +284,4 @@ export default function SectorsModal({
         </div>
     );
 }
+
