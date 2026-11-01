@@ -220,6 +220,20 @@ app.get('/api/banana', async (req, res) => {
     });
 });
 
+
+// Helper to calculate pilot career level and max sector reached
+function getPilotLevelAndSector(userId, totalScore) {
+    const pilotLevel = Math.max(1, Math.floor((Number(totalScore) || 0) / 5000) + 1);
+    let maxSector = 1;
+    if (userId) {
+        try {
+            const row = db.prepare('SELECT MAX(level_reached) as maxLevel FROM scores WHERE user_id = ?').get(userId);
+            if (row && row.maxLevel) maxSector = Math.max(1, Number(row.maxLevel));
+        } catch (_) {}
+    }
+    return { pilotLevel, maxSector };
+}
+
 // 3. Virtual Identity: Pilot Login
 app.post('/api/login', (req, res) => {
     const { username, password } = req.body;
@@ -263,6 +277,8 @@ app.post('/api/login', (req, res) => {
                 avatar: user.avatar,
                 shipClass: user.ship_class,
                 rank: user.rank,
+                pilotLevel: getPilotLevelAndSector(user.id, user.total_score).pilotLevel,
+                maxSector: getPilotLevelAndSector(user.id, user.total_score).maxSector,
                 totalScore: user.total_score,
                 bananaSolved: user.banana_solved,
                 gamesPlayed: user.games_played

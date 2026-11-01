@@ -42,10 +42,13 @@ class BaseEnemy {
  * 1. Scout Drone: Agile, weaves left and right while diving
  */
 class ScoutDrone extends BaseEnemy {
-    constructor(x, y) {
-        super(x, y, 32, 34, 20, 100);
-        this.vx = (Math.random() - 0.5) * 3;
-        this.vy = Math.random() * 1.5 + 2.5;
+    constructor(x, y, sector = 1) {
+        const hp = 20 + (sector - 1) * 8;
+        super(x, y, 32, 34, hp, 100 + (sector - 1) * 20);
+        this.sector = sector;
+        const speedScale = 1 + (sector - 1) * 0.12;
+        this.vx = (Math.random() - 0.5) * 3 * speedScale;
+        this.vy = (Math.random() * 1.5 + 2.5) * speedScale;
         this.angle = 0;
         this.freq = Math.random() * 0.04 + 0.03;
         this.startX = x;
@@ -101,18 +104,21 @@ class ScoutDrone extends BaseEnemy {
  * 2. Asteroid: Rotates realistically; splits on destruction
  */
 class Asteroid extends BaseEnemy {
-    constructor(x, y, size = 'large') {
+    constructor(x, y, size = 'large', sector = 1) {
         const radiusMap = { large: 32, medium: 20, small: 12 };
         const hpMap = { large: 45, medium: 25, small: 10 };
         const ptMap = { large: 80, medium: 50, small: 25 };
 
         const radius = radiusMap[size] || 24;
-        super(x - radius, y - radius, radius * 2, radius * 2, hpMap[size], ptMap[size]);
+        const hp = (hpMap[size] || 30) + (sector - 1) * 10;
+        super(x - radius, y - radius, radius * 2, radius * 2, hp, ptMap[size]);
 
         this.size = size;
+        this.sector = sector;
         this.radius = radius;
-        this.vx = (Math.random() - 0.5) * 1.5;
-        this.vy = Math.random() * 1.2 + 1.2;
+        const speedScale = 1 + (sector - 1) * 0.12;
+        this.vx = (Math.random() - 0.5) * 1.5 * speedScale;
+        this.vy = (Math.random() * 1.2 + 1.2) * speedScale;
         this.rot = Math.random() * Math.PI * 2;
         this.rotSpeed = (Math.random() - 0.5) * 0.04;
 
@@ -175,11 +181,14 @@ class Asteroid extends BaseEnemy {
  * 3. Crimson Raider: Fires targeting laser pulses at the player
  */
 class CrimsonRaider extends BaseEnemy {
-    constructor(x, y) {
-        super(x, y, 42, 40, 50, 200);
-        this.vx = (Math.random() > 0.5 ? 1 : -1) * (Math.random() * 1.5 + 1.2);
-        this.vy = Math.random() * 0.8 + 1.2;
-        this.shootTimer = Math.floor(Math.random() * 60) + 40;
+    constructor(x, y, sector = 1) {
+        const hp = 50 + (sector - 1) * 20;
+        super(x, y, 42, 40, hp, 200 + (sector - 1) * 50);
+        this.sector = sector;
+        const speedScale = 1 + (sector - 1) * 0.15;
+        this.vx = (Math.random() > 0.5 ? 1 : -1) * (Math.random() * 1.5 + 1.2) * speedScale;
+        this.vy = (Math.random() * 0.8 + 1.2) * speedScale;
+        this.shootTimer = Math.floor(Math.random() * 40) + Math.max(30, 50 - (sector - 1) * 6);
     }
 
     update(enemyBullets, playerX, playerY) {
@@ -202,7 +211,7 @@ class CrimsonRaider extends BaseEnemy {
             const dx = playerX - centerX;
             const dy = playerY - bottomY;
             const dist = Math.hypot(dx, dy) || 1;
-            const bulletSpeed = 5.5;
+            const bulletSpeed = 5.5 + Math.min(3.5, (this.sector - 1) * 0.6);
 
             enemyBullets.push(new EnemyBullet(
                 centerX,
@@ -260,10 +269,12 @@ class CrimsonRaider extends BaseEnemy {
  * 4. Void Bomber: Launches homing plasma orbs
  */
 class VoidBomber extends BaseEnemy {
-    constructor(x, y) {
-        super(x, y, 54, 48, 90, 350);
-        this.vy = 1.0;
-        this.shootTimer = 90;
+    constructor(x, y, sector = 1) {
+        const hp = 90 + (sector - 1) * 35;
+        super(x, y, 54, 48, hp, 350 + (sector - 1) * 75);
+        this.sector = sector;
+        this.vy = 1.0 + Math.min(1.2, (sector - 1) * 0.2);
+        this.shootTimer = Math.max(50, 90 - (sector - 1) * 10);
     }
 
     update(enemyBullets, playerX, playerY) {
@@ -271,14 +282,15 @@ class VoidBomber extends BaseEnemy {
         this.shootTimer--;
 
         if (this.shootTimer <= 0) {
-            this.shootTimer = 110;
+            this.shootTimer = Math.max(65, 110 - (this.sector - 1) * 12);
             const centerX = this.x + this.width / 2;
             const bottomY = this.y + this.height;
 
+            const speed = 4.5 + Math.min(2.5, (this.sector - 1) * 0.5);
             // Triple cluster spread
-            enemyBullets.push(new EnemyBullet(centerX, bottomY, 0, 4.5, '#ffaa00', 6));
-            enemyBullets.push(new EnemyBullet(centerX, bottomY, -1.8, 4.0, '#ffaa00', 5));
-            enemyBullets.push(new EnemyBullet(centerX, bottomY, 1.8, 4.0, '#ffaa00', 5));
+            enemyBullets.push(new EnemyBullet(centerX, bottomY, 0, speed, '#ffaa00', 6));
+            enemyBullets.push(new EnemyBullet(centerX, bottomY, -1.8, speed - 0.5, '#ffaa00', 5));
+            enemyBullets.push(new EnemyBullet(centerX, bottomY, 1.8, speed - 0.5, '#ffaa00', 5));
         }
 
         if (this.hitFlashTimer > 0) this.hitFlashTimer--;

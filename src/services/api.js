@@ -8,6 +8,10 @@
 
 const API_BASE = '/api';
 
+export function calculatePilotLevel(totalScore) {
+    return Math.max(1, Math.floor((Number(totalScore) || 0) / 5000) + 1);
+}
+
 export const API = {
     async checkBackendStatus() {
         try {
@@ -63,9 +67,9 @@ export const API = {
             // Local fallback login for demo
             if (password === 'Password123!') {
                 const demoUsers = {
-                    shepard: { id: 1, username: 'shepard', callsign: 'Commander Shepard', avatar: 'pilot_1', shipClass: 'Dreadnought', rank: 'Fleet Admiral', totalScore: 54200, gamesPlayed: 24, bananaSolved: 18 },
-                    fox: { id: 2, username: 'fox', callsign: 'Star Fox McCloud', avatar: 'pilot_2', shipClass: 'Interceptor', rank: 'Commander', totalScore: 36200, gamesPlayed: 19, bananaSolved: 14 },
-                    valkyrie: { id: 3, username: 'valkyrie', callsign: 'Nova Valkyrie', avatar: 'pilot_3', shipClass: 'Phantom Recon', rank: 'Lieutenant', totalScore: 28900, gamesPlayed: 12, bananaSolved: 9 }
+                    shepard: { id: 1, username: 'shepard', callsign: 'Commander Shepard', avatar: 'pilot_1', shipClass: 'Dreadnought', rank: 'Fleet Admiral', pilotLevel: 11, maxSector: 8, totalScore: 54200, gamesPlayed: 24, bananaSolved: 18 },
+                    fox: { id: 2, username: 'fox', callsign: 'Star Fox McCloud', avatar: 'pilot_2', shipClass: 'Interceptor', rank: 'Commander', pilotLevel: 8, maxSector: 6, totalScore: 36200, gamesPlayed: 19, bananaSolved: 14 },
+                    valkyrie: { id: 3, username: 'valkyrie', callsign: 'Nova Valkyrie', avatar: 'pilot_3', shipClass: 'Phantom Recon', rank: 'Lieutenant', pilotLevel: 6, maxSector: 5, totalScore: 28900, gamesPlayed: 12, bananaSolved: 9 }
                 };
                 if (demoUsers[username]) {
                     this.setCurrentUser(demoUsers[username]);
@@ -178,6 +182,8 @@ export const API = {
             });
             if (res.ok && currentUser && currentUser.id) {
                 currentUser.totalScore = (currentUser.totalScore || 0) + Number(payload.score || 0);
+                currentUser.pilotLevel = calculatePilotLevel(currentUser.totalScore);
+                currentUser.maxSector = Math.max(currentUser.maxSector || 1, Number(payload.levelReached || payload.level || 1));
                 currentUser.gamesPlayed = (currentUser.gamesPlayed || 0) + 1;
                 currentUser.bananaSolved = (currentUser.bananaSolved || 0) + Number(payload.bananaSolved || 0);
                 this.setCurrentUser(currentUser);
@@ -201,6 +207,8 @@ export const API = {
             avatar: 'pilot_1',
             shipClass: 'Interceptor',
             rank: 'Cadet',
+            pilotLevel: 1,
+            maxSector: 1,
             totalScore: 0,
             gamesPlayed: 0,
             bananaSolved: 0,

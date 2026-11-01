@@ -949,24 +949,29 @@ class GameEngine {
         this.spawnCooldown--;
         if (this.spawnCooldown > 0) return;
 
-        // Dynamic difficulty curve based on Sector Level
-        this.spawnCooldown = Math.max(35, 75 - this.level * 8);
+        // Dynamic difficulty curve: faster spawns as sector level increases
+        this.spawnCooldown = Math.max(22, 72 - (this.level - 1) * 10);
 
         const spawnRoll = Math.random();
         const randX = Math.random() * (this.width - 120) + 60;
 
-        if (spawnRoll < 0.40) {
-            // Scout Drone
-            this.enemies.push(new ScoutDrone(randX, -40));
-        } else if (spawnRoll < 0.65) {
-            // Asteroid
-            this.enemies.push(new Asteroid(randX, -50, Math.random() > 0.5 ? 'large' : 'medium'));
-        } else if (spawnRoll < 0.85) {
-            // Crimson Raider
-            this.enemies.push(new CrimsonRaider(randX, -50));
+        // Escalating hostility composition: aggressive gunships spawn much more frequently in higher sectors
+        const raiderThreshold = Math.min(0.38, 0.15 + (this.level - 1) * 0.08);
+        const bomberThreshold = Math.min(0.28, 0.05 + (this.level - 1) * 0.07);
+        const scoutThreshold = Math.max(0.20, 0.45 - (this.level - 1) * 0.08);
+
+        if (spawnRoll < scoutThreshold) {
+            // Scout Drone (scaled with sector speed & HP)
+            this.enemies.push(new ScoutDrone(randX, -40, this.level));
+        } else if (spawnRoll < 1 - raiderThreshold - bomberThreshold) {
+            // Asteroid (scaled with sector drift velocity)
+            this.enemies.push(new Asteroid(randX, -50, Math.random() > 0.5 ? 'large' : 'medium', this.level));
+        } else if (spawnRoll < 1 - bomberThreshold) {
+            // Crimson Raider (targeting laser ship, scaled firepower)
+            this.enemies.push(new CrimsonRaider(randX, -50, this.level));
         } else {
-            // Void Bomber
-            this.enemies.push(new VoidBomber(randX, -60));
+            // Void Bomber (triple plasma spread ship, scaled armor)
+            this.enemies.push(new VoidBomber(randX, -60, this.level));
         }
     }
 

@@ -2989,3 +2989,33 @@ kbd {
     gap: 8px;
   }
 }
+
+
+.pilot-lvl-badge {
+    display: inline-block;
+    padding: 1px 5px;
+    background: rgba(0, 240, 255, 0.18);
+    border: 1px solid rgba(0, 240, 255, 0.5);
+    border-radius: 4px;
+    color: #00f0ff;
+    font-size: 8.5px;
+    font-family: var(--font-heading);
+    font-weight: 800;
+    margin-right: 6px;
+    letter-spacing: 0.5px;
+    vertical-align: middle;
+}
+
+.hud-lvl-pill {
+    display: inline-block;
+    padding: 1px 4px;
+    background: rgba(0, 240, 255, 0.2);
+    border: 1px solid rgba(0, 240, 255, 0.55);
+    border-radius: 3px;
+    color: #00f0ff;
+    font-size: 8px;
+    font-weight: 800;
+    margin-right: 4px;
+    letter-spacing: 0.5px;
+    vertical-align: middle;
+}

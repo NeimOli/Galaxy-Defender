@@ -46,8 +46,16 @@ export default function ProfileModal({
 
                 <div className="stats-grid" style={{ margin: '0 auto 20px' }}>
                     <div className="stat-box">
+                        <div className="hud-label">Pilot Level</div>
+                        <div className="stat-val" style={{ fontSize: '14px', color: '#00f0ff', fontWeight: 800 }}>LVL {user.pilotLevel || Math.max(1, Math.floor((user.totalScore || 0) / 5000) + 1)}</div>
+                    </div>
+                    <div className="stat-box">
                         <div className="hud-label">Military Rank</div>
                         <div className="stat-val" style={{ fontSize: '14px', color: 'var(--cyan-primary)' }}>{user.rank || 'Cadet'}</div>
+                    </div>
+                    <div className="stat-box">
+                        <div className="hud-label">Max Sector</div>
+                        <div className="stat-val" style={{ fontSize: '14px', color: '#ffd700', fontWeight: 800 }}>Sector {user.maxSector || 1}</div>
                     </div>
                     <div className="stat-box">
                         <div className="hud-label">Ship Class</div>

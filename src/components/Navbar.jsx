@@ -59,7 +59,7 @@ export default function Navbar({
                     </div>
                     <div className="pilot-info-text">
                         <span className="pilot-callsign">{user.callsign || 'Guest Vanguard'}</span>
-                        <span className="pilot-rank">{user.rank || 'Cadet'}</span>
+                        <span className="pilot-rank"><span className="pilot-lvl-badge">LVL {user.pilotLevel || Math.max(1, Math.floor((user.totalScore || 0) / 5000) + 1)}</span>{user.rank || 'Cadet'}</span>
                     </div>
                 </div>
 
