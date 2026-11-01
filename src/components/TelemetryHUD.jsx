@@ -73,7 +73,11 @@ export default function TelemetryHUD({
                             {user?.callsign || 'Guest Vanguard'}
                         </div>
                         <div className="hud-pilot-meta">
-                            <span className="hud-pilot-rank"><span className="hud-lvl-pill">LVL {user?.pilotLevel || Math.max(1, Math.floor((user?.totalScore || 0) / 5000) + 1)}</span>{user?.rank || 'Cadet'}</span>
+                            {user?.isGuest ? (
+                                <span className="hud-pilot-rank" style={{ color: 'rgba(255,255,255,0.45)' }}>GUEST // LOG IN FOR LVL</span>
+                            ) : (
+                                <span className="hud-pilot-rank"><span className="hud-lvl-pill">LVL {user?.pilotLevel || Math.max(1, Math.floor((user?.totalScore || 0) / 5000) + 1)}</span>{user?.rank || 'Cadet'}</span>
+                            )}
                             <span className="hud-pilot-sep">//</span>
                             <span className="hud-pilot-ship">{user?.shipClass || 'Interceptor'}</span>
                         </div>

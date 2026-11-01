@@ -11,6 +11,7 @@ import GameCanvas from './components/GameCanvas.jsx';
 import ArchitectureModules from './components/ArchitectureModules.jsx';
 
 import BananaModal from './components/BananaModal.jsx';
+import SectorsModal from './components/SectorsModal.jsx';
 import LeaderboardModal from './components/LeaderboardModal.jsx';
 import ProfileModal from './components/ProfileModal.jsx';
 import LoginModal from './components/LoginModal.jsx';
@@ -150,7 +151,7 @@ export default function App() {
   };
 
   // ── Game controls triggered from Navbar ──────────────────────────────────
-  const handleStartGame = () => {
+  const handleStartGame = (startLevel) => {
     if (!window.game && window.GameEngine) {
       try {
         window.game = new window.GameEngine();
@@ -159,7 +160,10 @@ export default function App() {
       }
     }
     if (window.game) {
-      window.game.startGame();
+      const chosenLevel = (startLevel && Number(startLevel) >= 1)
+        ? Number(startLevel)
+        : (!user.isGuest ? (user.currentLevel || user.maxSector || 1) : 1);
+      window.game.startGame(chosenLevel);
       window.game.updateHUD();
       setGameState('PLAYING');
     }
@@ -218,6 +222,13 @@ export default function App() {
     window.addEventListener('audio_mute_changed', syncAudio);
     window.addEventListener('galaxy_hud_update', handleGalaxyHud);
     window.addEventListener('galaxy_game_over', handleGalaxyGameOver);
+    const handleLevelAdvanced = (e) => {
+      if (e.detail?.level) {
+        API.saveProgressLevel(e.detail.level);
+        setUser(API.getCurrentUser());
+      }
+    };
+    window.addEventListener('galaxy_level_advanced', handleLevelAdvanced);
     window.addEventListener('keydown', handleGlobalKey);
 
     return () => {
@@ -226,6 +237,7 @@ export default function App() {
       window.removeEventListener('audio_mute_changed', syncAudio);
       window.removeEventListener('galaxy_hud_update', handleGalaxyHud);
       window.removeEventListener('galaxy_game_over', handleGalaxyGameOver);
+      window.removeEventListener('galaxy_level_advanced', handleLevelAdvanced);
       window.removeEventListener('keydown', handleGlobalKey);
     };
   }, [handleHudUpdate]);
@@ -246,6 +258,7 @@ export default function App() {
         gameState={gameState}
         onSoundToggle={handleSoundToggle}
         onOpenBanana={() => { setBananaSource('menu'); setModal('banana'); }}
+        onOpenSectors={() => setModal('sectors')}
         onOpenLeaderboard={() => setModal('leaderboard')}
         onOpenProfile={() => setModal('profile')}
         onOpenTests={() => setModal('tests')}
@@ -331,12 +344,21 @@ export default function App() {
                 <div className="key-pill highlight-gold"><kbd>B</kbd> <span>Mega Bomb</span></div>
               </div>
 
-              <button className="btn-launch" onClick={handleStartGame}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                  <polygon points="5 3 19 12 5 21 5 3"/>
-                </svg>
-                LAUNCH MISSION
-              </button>
+              <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap', width: '100%', maxWidth: '440px', margin: '0 auto' }}>
+                <button className="btn-launch" onClick={() => handleStartGame(!user.isGuest ? (user.currentLevel || 1) : 1)}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <polygon points="5 3 19 12 5 21 5 3"/>
+                  </svg>
+                  {!user.isGuest && (user.currentLevel || 1) > 1
+                    ? `CONTINUE SECTOR ${user.currentLevel}`
+                    : 'LAUNCH MISSION'}
+                </button>
+                {!user.isGuest && (user.currentLevel || 1) > 1 && (
+                  <button className="btn btn-secondary" onClick={() => handleStartGame(1)} style={{ padding: '12px 18px', fontSize: '0.85rem' }}>
+                    SECTOR 1
+                  </button>
+                )}
+              </div>
               <p className="overlay-hint2">
                 Click · Drag · Keyboard · WASD · Full Touch Compatible
               </p>
@@ -412,12 +434,19 @@ export default function App() {
               </div>
 
               <div className="overlay-btn-group">
-                <button className="btn-launch" onClick={handleStartGame}>
+                <button className="btn-launch" onClick={() => handleStartGame(!user.isGuest ? (gameOverStats.level || user.currentLevel || 1) : 1)}>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
                     <polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
                   </svg>
-                  DEPLOY NEW CRAFT
+                  {!user.isGuest && (gameOverStats.level || user.currentLevel || 1) > 1
+                    ? `RETRY SECTOR ${gameOverStats.level || user.currentLevel}`
+                    : 'DEPLOY NEW CRAFT'}
                 </button>
+                {!user.isGuest && (gameOverStats.level || user.currentLevel || 1) > 1 && (
+                  <button className="btn-secondary" onClick={() => handleStartGame(1)}>
+                    RESTART SECTOR 1
+                  </button>
+                )}
                 <button className="btn-secondary" onClick={() => setModal('leaderboard')}>
                   VIEW FLIGHT RECORDS
                 </button>
@@ -488,6 +517,18 @@ export default function App() {
             }
           }}
           onSolve={handleBananaSolve}
+        />
+      )}
+
+      {modal === 'sectors' && (
+        <SectorsModal
+          isOpen
+          user={user}
+          onClose={() => setModal(null)}
+          onSelectSector={(sec) => {
+            setModal(null);
+            handleStartGame(sec);
+          }}
         />
       )}
 

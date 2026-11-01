@@ -708,11 +708,11 @@ class GameEngine {
         }
     }
 
-    startGame() {
+    startGame(initialLevel = null) {
         this.audio.init();
         this.state = 'PLAYING';
         this.score = 0;
-        this.level = 1;
+        this.level = initialLevel && Number(initialLevel) >= 1 ? Number(initialLevel) : 1;
         this.enemiesDestroyed = 0;
         this.shotsFired = 0;
         this.shotsHit = 0;
@@ -1002,6 +1002,7 @@ class GameEngine {
         this.waveTimer = 0;
 
         this.particles.addFloatingText(`SECTOR CLEARED! ADVANCING TO SECTOR ${this.level}`, this.width / 2, this.height / 2, '#00ffcc');
+        window.dispatchEvent(new CustomEvent('galaxy_level_advanced', { detail: { level: this.level } }));
     }
 
     checkCollisions() {

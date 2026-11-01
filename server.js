@@ -83,6 +83,13 @@ try {
     if (!scoresCols.includes('ship_class')) {
         db.exec("ALTER TABLE scores ADD COLUMN ship_class TEXT DEFAULT 'Interceptor'");
     }
+    const userCols = db.pragma('table_info(users)').map(c => c.name);
+    if (!userCols.includes('current_level')) {
+        db.exec("ALTER TABLE users ADD COLUMN current_level INTEGER DEFAULT 1");
+    }
+    if (!userCols.includes('max_sector')) {
+        db.exec("ALTER TABLE users ADD COLUMN max_sector INTEGER DEFAULT 1");
+    }
 } catch (_) {}
 
 // Pre-populate Default Demo Pilots if empty
@@ -225,13 +232,19 @@ app.get('/api/banana', async (req, res) => {
 function getPilotLevelAndSector(userId, totalScore) {
     const pilotLevel = Math.max(1, Math.floor((Number(totalScore) || 0) / 5000) + 1);
     let maxSector = 1;
+    let currentLevel = 1;
     if (userId) {
         try {
+            const userRow = db.prepare('SELECT current_level, max_sector FROM users WHERE id = ?').get(userId);
+            if (userRow) {
+                currentLevel = Math.max(1, Number(userRow.current_level) || 1);
+                maxSector = Math.max(1, Number(userRow.max_sector) || 1);
+            }
             const row = db.prepare('SELECT MAX(level_reached) as maxLevel FROM scores WHERE user_id = ?').get(userId);
-            if (row && row.maxLevel) maxSector = Math.max(1, Number(row.maxLevel));
+            if (row && row.maxLevel) maxSector = Math.max(maxSector, Number(row.maxLevel));
         } catch (_) {}
     }
-    return { pilotLevel, maxSector };
+    return { pilotLevel, maxSector, currentLevel };
 }
 
 // 3. Virtual Identity: Pilot Login
@@ -279,6 +292,7 @@ app.post('/api/login', (req, res) => {
                 rank: user.rank,
                 pilotLevel: getPilotLevelAndSector(user.id, user.total_score).pilotLevel,
                 maxSector: getPilotLevelAndSector(user.id, user.total_score).maxSector,
+                currentLevel: getPilotLevelAndSector(user.id, user.total_score).currentLevel,
                 totalScore: user.total_score,
                 bananaSolved: user.banana_solved,
                 gamesPlayed: user.games_played
@@ -388,6 +402,27 @@ app.get('/api/user-records/:userId', (req, res) => {
 });
 
 // 6. Submit Score
+
+// Save Pilot Current Level & Max Sector
+app.post('/api/save-level', (req, res) => {
+    const { userId, level } = req.body;
+    if (!userId || !level) {
+        return res.status(400).json({ status: 'error', message: 'User ID and level required' });
+    }
+    const cleanLevel = Math.max(1, Number(level) || 1);
+    try {
+        db.prepare(`
+            UPDATE users
+            SET current_level = ?,
+                max_sector = MAX(COALESCE(max_sector, 1), ?)
+            WHERE id = ?
+        `).run(cleanLevel, cleanLevel, userId);
+        res.json({ status: 'success', currentLevel: cleanLevel });
+    } catch (err) {
+        res.status(500).json({ status: 'error', message: err.message });
+    }
+});
+
 app.post('/api/submit-score', (req, res) => {
     const { userId, pilotName, score, levelReached, enemiesDestroyed, bananaSolved = 0, accuracy = 0, shipClass = 'Interceptor' } = req.body;
 
@@ -403,11 +438,14 @@ app.post('/api/submit-score', (req, res) => {
             const newTotal = user.total_score + score;
             const newRank = calculateRank(newTotal);
 
+            const cleanLevel = Math.max(1, Number(levelReached) || 1);
             db.prepare(`
                 UPDATE users
-                SET total_score = ?, banana_solved = banana_solved + ?, games_played = games_played + 1, rank = ?
+                SET total_score = ?, banana_solved = banana_solved + ?, games_played = games_played + 1, rank = ?,
+                    current_level = ?,
+                    max_sector = MAX(COALESCE(max_sector, 1), ?)
                 WHERE id = ?
-            `).run(newTotal, bananaSolved, newRank, userId);
+            `).run(newTotal, bananaSolved, newRank, cleanLevel, cleanLevel, userId);
         }
     }
 

@@ -67,9 +67,9 @@ export const API = {
             // Local fallback login for demo
             if (password === 'Password123!') {
                 const demoUsers = {
-                    shepard: { id: 1, username: 'shepard', callsign: 'Commander Shepard', avatar: 'pilot_1', shipClass: 'Dreadnought', rank: 'Fleet Admiral', pilotLevel: 11, maxSector: 8, totalScore: 54200, gamesPlayed: 24, bananaSolved: 18 },
-                    fox: { id: 2, username: 'fox', callsign: 'Star Fox McCloud', avatar: 'pilot_2', shipClass: 'Interceptor', rank: 'Commander', pilotLevel: 8, maxSector: 6, totalScore: 36200, gamesPlayed: 19, bananaSolved: 14 },
-                    valkyrie: { id: 3, username: 'valkyrie', callsign: 'Nova Valkyrie', avatar: 'pilot_3', shipClass: 'Phantom Recon', rank: 'Lieutenant', pilotLevel: 6, maxSector: 5, totalScore: 28900, gamesPlayed: 12, bananaSolved: 9 }
+                    shepard: { id: 1, username: 'shepard', callsign: 'Commander Shepard', avatar: 'pilot_1', shipClass: 'Dreadnought', rank: 'Fleet Admiral', pilotLevel: 11, maxSector: 8, currentLevel: 5, totalScore: 54200, gamesPlayed: 24, bananaSolved: 18 },
+                    fox: { id: 2, username: 'fox', callsign: 'Star Fox McCloud', avatar: 'pilot_2', shipClass: 'Interceptor', rank: 'Commander', pilotLevel: 8, maxSector: 6, currentLevel: 4, totalScore: 36200, gamesPlayed: 19, bananaSolved: 14 },
+                    valkyrie: { id: 3, username: 'valkyrie', callsign: 'Nova Valkyrie', avatar: 'pilot_3', shipClass: 'Phantom Recon', rank: 'Lieutenant', pilotLevel: 6, maxSector: 5, currentLevel: 3, totalScore: 28900, gamesPlayed: 12, bananaSolved: 9 }
                 };
                 if (demoUsers[username]) {
                     this.setCurrentUser(demoUsers[username]);
@@ -161,6 +161,23 @@ export const API = {
         return all.filter(s => Number(s.user_id) === Number(userId));
     },
 
+    
+    async saveProgressLevel(level) {
+        const currentUser = this.getCurrentUser();
+        if (!currentUser || currentUser.isGuest || !currentUser.id) return;
+        currentUser.currentLevel = Math.max(1, Number(level) || 1);
+        currentUser.maxSector = Math.max(currentUser.maxSector || 1, currentUser.currentLevel);
+        this.setCurrentUser(currentUser);
+
+        try {
+            await fetch(`${API_BASE}/save-level`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId: currentUser.id, level: currentUser.currentLevel })
+            });
+        } catch (_) {}
+    },
+
     async submitScore(payload) {
         const currentUser = this.getCurrentUser();
         const body = {
@@ -183,7 +200,9 @@ export const API = {
             if (res.ok && currentUser && currentUser.id) {
                 currentUser.totalScore = (currentUser.totalScore || 0) + Number(payload.score || 0);
                 currentUser.pilotLevel = calculatePilotLevel(currentUser.totalScore);
-                currentUser.maxSector = Math.max(currentUser.maxSector || 1, Number(payload.levelReached || payload.level || 1));
+                const finalLvl = Number(payload.levelReached || payload.level || 1);
+                currentUser.currentLevel = finalLvl;
+                currentUser.maxSector = Math.max(currentUser.maxSector || 1, finalLvl);
                 currentUser.gamesPlayed = (currentUser.gamesPlayed || 0) + 1;
                 currentUser.bananaSolved = (currentUser.bananaSolved || 0) + Number(payload.bananaSolved || 0);
                 this.setCurrentUser(currentUser);
@@ -207,8 +226,9 @@ export const API = {
             avatar: 'pilot_1',
             shipClass: 'Interceptor',
             rank: 'Cadet',
-            pilotLevel: 1,
+            pilotLevel: null,
             maxSector: 1,
+            currentLevel: 1,
             totalScore: 0,
             gamesPlayed: 0,
             bananaSolved: 0,

@@ -9,6 +9,7 @@ export default function ProfileModal({
     onRegister,
     onOpenRegister,
     onOpenRecords,
+    onOpenSectors,
     onLogout
 }) {
     const handleLogin = onLogin || onOpenLogin;
@@ -47,7 +48,9 @@ export default function ProfileModal({
                 <div className="stats-grid" style={{ margin: '0 auto 20px' }}>
                     <div className="stat-box">
                         <div className="hud-label">Pilot Level</div>
-                        <div className="stat-val" style={{ fontSize: '14px', color: '#00f0ff', fontWeight: 800 }}>LVL {user.pilotLevel || Math.max(1, Math.floor((user.totalScore || 0) / 5000) + 1)}</div>
+                        <div className="stat-val" style={{ fontSize: '14px', color: user.isGuest ? 'rgba(255,255,255,0.4)' : '#00f0ff', fontWeight: 800 }}>
+                            {user.isGuest ? 'LOCKED (Guest)' : `LVL ${user.pilotLevel || Math.max(1, Math.floor((user.totalScore || 0) / 5000) + 1)}`}
+                        </div>
                     </div>
                     <div className="stat-box">
                         <div className="hud-label">Military Rank</div>
@@ -55,7 +58,9 @@ export default function ProfileModal({
                     </div>
                     <div className="stat-box">
                         <div className="hud-label">Max Sector</div>
-                        <div className="stat-val" style={{ fontSize: '14px', color: '#ffd700', fontWeight: 800 }}>Sector {user.maxSector || 1}</div>
+                        <div className="stat-val" style={{ fontSize: '14px', color: user.isGuest ? 'rgba(255,255,255,0.4)' : '#ffd700', fontWeight: 800 }}>
+                            {user.isGuest ? 'Sector 1 (Locked)' : `Sector ${user.maxSector || 1}`}
+                        </div>
                     </div>
                     <div className="stat-box">
                         <div className="hud-label">Ship Class</div>
@@ -78,6 +83,24 @@ export default function ProfileModal({
                         <div className="stat-val" style={{ fontSize: '12px', color: 'var(--emerald-primary)' }}>VERIFIED</div>
                     </div>
                 </div>
+
+                {!user?.isGuest && onOpenSectors && (
+                    <button
+                        className="btn btn-primary"
+                        style={{ width: '100%', marginBottom: '10px' }}
+                        onClick={() => {
+                            onClose();
+                            onOpenSectors();
+                        }}
+                    >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" style={{ marginRight: '6px' }}>
+                            <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+                            <polyline points="2 17 12 22 22 17"/>
+                            <polyline points="2 12 12 17 22 12"/>
+                        </svg>
+                        Open Sector Flight Directory & Level Select
+                    </button>
+                )}
 
                 {!user?.isGuest && user?.id && onOpenRecords && (
                     <button

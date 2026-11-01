@@ -47,8 +47,8 @@ export default function GameCanvas({
 
     // Override state transitions to notify React
     const origStart = engine.startGame.bind(engine);
-    engine.startGame = function () {
-      origStart();
+    engine.startGame = function (initialLevel) {
+      origStart(initialLevel);
       onStateChange('PLAYING');
     };
 
