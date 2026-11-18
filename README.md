@@ -117,9 +117,24 @@ The entire simulation is built on an asynchronous, decoupled event-driven archit
 
 ### Theme 4: Virtual Identity
 
-A complete persistent Virtual Identity subsystem distinguishes between casual guests and registered pilots:
-- **Pilot Authentication:** Secure login and registration backed by SQLite with BCrypt-standard salted password verification.
-- **Session Persistence:** Active pilot session is tracked seamlessly via `localStorage` and synchronized with the backend.
+A complete enterprise-grade Virtual Identity and Session Management subsystem:
+- **BCrypt Password Security (Replaced Legacy SHA-256):**
+  - Passwords are encrypted using salted **BCrypt** with 10 salt rounds (`bcryptjs`), mitigating dictionary and precomputed rainbow table attacks.
+  - Constant-time verification during login protects against timing-based user enumeration.
+  - Automated migration upgrades pre-existing demo accounts to modern salted BCrypt hashes on launch.
+- **Server-Side Session Storage (SQLite):**
+  - Active sessions are stored in an indexed `sessions` table in SQLite, mapping cryptographically random 256-bit tokens to authenticated pilot IDs.
+  - Enforces strict 24-hour session lifespans (`expires_at`) with automatic pruning of expired tokens.
+  - Secure logout immediately purges the session record from SQLite and revokes the client cookie.
+- **Secure HTTP-Only Cookies:**
+  - Session cookies (`galaxy_pilot_session`) are configured with `httpOnly: true` (blocking JavaScript read access and protecting against XSS token theft).
+  - Configured with `sameSite: 'lax'` (defending against Cross-Site Request Forgery) and `secure: true` under production HTTPS environments.
+- **Protected Features & Backend Authorization:**
+  - Express middleware (`requireAuth`) guards protected endpoints:
+    - `GET /api/auth/me` — Session integrity validation and profile synchronization on client load.
+    - `POST /api/save-level` — Sector progression restricted to validated sessions, enforcing session user ID.
+    - `GET /api/user-records/:userId` — Prevents pilots from querying dossiers belonging to other users (HTTP 403 Forbidden).
+    - `POST /api/submit-score` — Associates high scores exclusively with verified sessions; unauthenticated submissions default to unranked Guest Vanguard.
 - **Guest Vanguard vs. Authenticated Pilot:**
   - **Guest:** Instant access to combat at Sector 1 without registration. Career level progression, sector continuation, and Hall of Fame ranking are locked.
   - **Authenticated Pilot:** Displays pilot career level (`LVL X`) on the Navbar and HUD, unlocks the Sectors directory modal, saves progress automatically to SQLite (`current_level` / `max_sector`), and enables sector continuation.

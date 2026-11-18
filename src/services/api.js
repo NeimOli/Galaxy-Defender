@@ -3,6 +3,7 @@
  * Interfaces with:
  *  - SQLite Express Backend (/api/...)
  *  - Dr. Marc Conrad Banana API Gateway
+ *  - Server-Side Sessions & Secure HTTP-Only Cookies
  *  - Local fallback state
  */
 
@@ -15,10 +16,10 @@ export function calculatePilotLevel(totalScore) {
 export const API = {
     async checkBackendStatus() {
         try {
-            const res = await fetch(`${API_BASE}/status`);
+            const res = await fetch(`${API_BASE}/status`, { credentials: 'include' });
             if (res.ok) {
                 const data = await res.json();
-                return data.status === 'success';
+                return data.status === 'success' || data.success === true;
             }
         } catch {
             return false;
@@ -28,10 +29,10 @@ export const API = {
 
     async fetchBananaPuzzle() {
         try {
-            const res = await fetch(`${API_BASE}/banana`);
+            const res = await fetch(`${API_BASE}/banana`, { credentials: 'include' });
             if (res.ok) {
                 const json = await res.json();
-                if (json.status === 'success' && json.data) {
+                if ((json.status === 'success' || json.success === true) && json.data) {
                     return json.data;
                 }
             }
@@ -50,21 +51,50 @@ export const API = {
         };
     },
 
+    /**
+     * Verifies current session against backend SQLite session store.
+     * Validates expiration and refreshes user telemetry.
+     */
+    async verifySession() {
+        try {
+            const res = await fetch(`${API_BASE}/auth/me`, {
+                method: 'GET',
+                credentials: 'include'
+            });
+            if (res.ok) {
+                const data = await res.json();
+                if (data.success && data.data?.user) {
+                    this.setCurrentUser(data.data.user);
+                    return { authenticated: true, user: data.data.user };
+                }
+            } else if (res.status === 401) {
+                const current = this.getCurrentUser();
+                if (!current.isGuest) {
+                    this.logout();
+                }
+            }
+        } catch (e) {
+            console.warn('[CLIENT API] Session verification error:', e);
+        }
+        return { authenticated: false, user: this.getCurrentUser() };
+    },
+
     async login(username, password) {
         try {
             const res = await fetch(`${API_BASE}/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
                 body: JSON.stringify({ username, password })
             });
             const data = await res.json();
-            if (data.status === 'success') {
+            if (data.success || data.status === 'success') {
                 this.setCurrentUser(data.data.user);
                 return { success: true, user: data.data.user, message: data.message };
             }
             return { success: false, message: data.message || 'Authorization failed.' };
         } catch {
-            // Local fallback login for demo
+            // Local fallback login for demo if backend is offline
             if (password === 'Password123!') {
                 const demoUsers = {
                     shepard: { id: 1, username: 'shepard', callsign: 'Commander Shepard', avatar: 'pilot_1', shipClass: 'Dreadnought', rank: 'Fleet Admiral', pilotLevel: 11, maxSector: 8, currentLevel: 5, totalScore: 54200, gamesPlayed: 24, bananaSolved: 18 },
@@ -85,10 +115,11 @@ export const API = {
             const res = await fetch(`${API_BASE}/register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
                 body: JSON.stringify(payload)
             });
             const data = await res.json();
-            if (data.status === 'success') {
+            if (data.success || data.status === 'success') {
                 this.setCurrentUser(data.data);
                 return { success: true, user: data.data, message: data.message };
             }
@@ -101,6 +132,9 @@ export const API = {
                 avatar: payload.avatar || 'pilot_1',
                 shipClass: payload.shipClass || 'Interceptor',
                 rank: 'Cadet',
+                pilotLevel: 1,
+                maxSector: 1,
+                currentLevel: 1,
                 totalScore: 0,
                 gamesPlayed: 0,
                 bananaSolved: 0
@@ -117,10 +151,10 @@ export const API = {
         }
 
         try {
-            const res = await fetch(`${API_BASE}/leaderboard`);
+            const res = await fetch(`${API_BASE}/leaderboard`, { credentials: 'include' });
             if (res.ok) {
                 const json = await res.json();
-                if (json.status === 'success' && json.data?.leaderboard) {
+                if ((json.status === 'success' || json.success === true) && json.data?.leaderboard) {
                     return json.data.leaderboard;
                 }
             }
@@ -147,10 +181,10 @@ export const API = {
         }
 
         try {
-            const res = await fetch(`${API_BASE}/user-records/${userId}`);
+            const res = await fetch(`${API_BASE}/user-records/${userId}`, { credentials: 'include' });
             if (res.ok) {
                 const json = await res.json();
-                if (json.status === 'success' && json.data?.records) {
+                if ((json.status === 'success' || json.success === true) && json.data?.records) {
                     return json.data.records;
                 }
             }
@@ -161,7 +195,6 @@ export const API = {
         return all.filter(s => Number(s.user_id) === Number(userId));
     },
 
-    
     async saveProgressLevel(level) {
         const currentUser = this.getCurrentUser();
         if (!currentUser || currentUser.isGuest || !currentUser.id) return;
@@ -173,15 +206,15 @@ export const API = {
             await fetch(`${API_BASE}/save-level`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId: currentUser.id, level: currentUser.currentLevel })
+                credentials: 'include',
+                body: JSON.stringify({ level: currentUser.currentLevel })
             });
-        } catch (_) {}
+        } catch (_) { }
     },
 
     async submitScore(payload) {
         const currentUser = this.getCurrentUser();
         const body = {
-            userId: payload.userId || currentUser.id || null,
             pilotName: payload.pilotName || currentUser.callsign || 'Guest Vanguard',
             shipClass: payload.shipClass || currentUser.shipClass || 'Interceptor',
             score: Number(payload.score) || 0,
@@ -195,6 +228,7 @@ export const API = {
             const res = await fetch(`${API_BASE}/submit-score`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
                 body: JSON.stringify(body)
             });
             if (res.ok && currentUser && currentUser.id) {
@@ -238,8 +272,6 @@ export const API = {
 
     setCurrentUser(user) {
         localStorage.setItem('galaxy_virtual_pilot', JSON.stringify(user));
-        document.cookie = `galaxy_pilot_session=${user.id || 'virtual'}; path=/; max-age=604800; SameSite=Lax`;
-        document.cookie = `galaxy_pilot_callsign=${encodeURIComponent(user.callsign)}; path=/; max-age=604800; SameSite=Lax`;
         window.dispatchEvent(new CustomEvent('virtual_identity_changed', { detail: user }));
     },
 
@@ -251,17 +283,21 @@ export const API = {
             avatar: 'pilot_1',
             shipClass: 'Interceptor',
             rank: 'Cadet',
+            pilotLevel: null,
+            maxSector: 1,
+            currentLevel: 1,
             totalScore: 0,
             gamesPlayed: 0,
             bananaSolved: 0,
             isGuest: true
         };
         this.setCurrentUser(guest);
-        document.cookie = 'galaxy_pilot_session=; path=/; max-age=0';
-        fetch(`${API_BASE}/logout`, { method: 'POST' }).catch(() => { });
+        fetch(`${API_BASE}/logout`, {
+            method: 'POST',
+            credentials: 'include'
+        }).catch(() => { });
         return guest;
     }
 };
 
 export default API;
-
