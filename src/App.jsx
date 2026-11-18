@@ -175,6 +175,15 @@ export default function App() {
     else if (gameState === 'PAUSED') window.game.resumeGame();
   };
 
+  // ── Session Validation on Mount ───────────────────────────────────────────
+  useEffect(() => {
+    API.verifySession().then(({ authenticated, user: validatedUser }) => {
+      if (authenticated && validatedUser) {
+        setUser(validatedUser);
+      }
+    });
+  }, []);
+
   // ── Keep user in sync if API session changes externally & global shortcuts ──
   useEffect(() => {
     const sync = () => setUser(API.getCurrentUser());

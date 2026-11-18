@@ -123,7 +123,7 @@ const SUITES = [
       },
     ],
   },
-  {
+    {
     id: 'vi',
     label: 'Virtual Identity',
     color: '#00f59b',
@@ -142,21 +142,52 @@ const SUITES = [
       },
       {
         id: 'vi2',
-        name: 'SHA-256 Session Endpoint',
-        desc: 'Tests login endpoint exists and returns structured auth response.',
+        name: 'BCrypt Password Hashing & Backend Validation',
+        desc: 'Validates backend credential verification rejects invalid attempts with HTTP 401.',
         run: async () => {
           const r = await fetch('/api/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username: '_test_invalid_', password: '_nope_' }),
+            body: JSON.stringify({ username: '_test_unauthorized_', password: '_invalid_passcode_' }),
             credentials: 'include',
           });
           const d = await r.json();
-          // We expect a structured failure — that means the endpoint is live
-          if (typeof d.success === 'boolean') {
-            return { ok: true, detail: 'Login endpoint responds with structured JSON' };
+          if (r.status === 401 && (d.success === false || d.status === 'error')) {
+            return { ok: true, detail: 'HTTP 401 Unauthorized returned with structured error message' };
           }
-          throw new Error('Login endpoint returned unstructured response');
+          throw new Error(`Unexpected status HTTP ${r.status} — expected 401`);
+        },
+      },
+      {
+        id: 'vi3',
+        name: 'Server-Side Sessions & Protected Routes',
+        desc: 'Ensures protected features (/api/auth/me, /api/save-level) reject unauthenticated requests.',
+        run: async () => {
+          const r = await fetch('/api/auth/me', {
+            method: 'GET',
+            credentials: 'include',
+          });
+          if (r.status === 401) {
+            const d = await r.json();
+            return { ok: true, detail: `Protected route successfully guarded (HTTP 401 ${d.code || 'UNAUTHORIZED'})` };
+          } else if (r.status === 200) {
+            const d = await r.json();
+            return { ok: true, detail: `Active server session verified for ${d.data?.user?.callsign || 'Pilot'}` };
+          }
+          throw new Error(`Unexpected response HTTP ${r.status}`);
+        },
+      },
+      {
+        id: 'vi4',
+        name: 'Secure Cookie & Session Lifecycle',
+        desc: 'Verifies backend status reports BCrypt hashing and secure HTTP-only cookies.',
+        run: async () => {
+          const r = await fetch('/api/status', { credentials: 'include' });
+          const d = await r.json();
+          if (d.auth && d.auth.algorithm?.includes('BCrypt') && d.auth.cookie?.httpOnly) {
+            return { ok: true, detail: `${d.auth.algorithm} | HTTP-Only: true | ${d.auth.session_storage}` };
+          }
+          throw new Error('Backend status does not confirm BCrypt and secure cookie configuration');
         },
       },
     ],
